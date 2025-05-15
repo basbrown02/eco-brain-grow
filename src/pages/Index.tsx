@@ -11,12 +11,52 @@ import BrainIcon from '@/components/BrainIcon';
 import EntryScreen from '@/components/EntryScreen';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import puzzles from '@/data/puzzles';
+import { dailyPuzzles, customPuzzles } from '@/data/puzzles';
+
+// New component to show completion screen between puzzles
+const CompletionScreen: React.FC<{ 
+  treesEarned: number,
+  puzzleType: string,
+  onContinue: () => void,
+  isComplete?: boolean
+}> = ({ treesEarned, puzzleType, onContinue, isComplete = false }) => {
+  return (
+    <div className="min-h-[50vh] flex flex-col items-center justify-center animate-fade-in">
+      <BrainIcon className="w-16 h-16 opacity-80 mb-6" />
+      
+      <h2 className="text-2xl font-bold text-ecobrain-charcoal mb-4">
+        {isComplete ? "All Done for Today!" : "Great Job!"}
+      </h2>
+      
+      <div className="mb-6 text-center">
+        <p className="mb-2">You earned <span className="text-ecobrain-green font-bold">{treesEarned} trees</span>!</p>
+        {!isComplete && (
+          <p className="text-ecobrain-charcoal/80">
+            Now it's time for your {puzzleType === 'daily' ? 'personalized' : 'final'} puzzle
+          </p>
+        )}
+      </div>
+      
+      {!isComplete ? (
+        <button 
+          onClick={onContinue}
+          className="bg-ecobrain-green hover:bg-ecobrain-green/90 text-white px-6 py-3 rounded-full text-lg hover:scale-105 transition-all"
+        >
+          Continue
+        </button>
+      ) : (
+        <p className="text-ecobrain-charcoal/80 text-center max-w-xs">
+          Come back tomorrow for a new daily puzzle and continue your streak!
+        </p>
+      )}
+    </div>
+  );
+};
 
 const Index = () => {
   const { toast } = useToast();
-  const [showEntry, setShowEntry] = useState(true); // Changed back to true to show entry screen
-  const [showPuzzleContent, setShowPuzzleContent] = useState(false); // Changed back to false until entry screen is dismissed
+  const [showEntry, setShowEntry] = useState(true);
+  const [showPuzzleContent, setShowPuzzleContent] = useState(false);
   const [isTextAnimating, setIsTextAnimating] = useState(false);
   const [availableHints, setAvailableHints] = useState(3);
   const [currentHint, setCurrentHint] = useState<string | undefined>(undefined);
@@ -25,10 +65,40 @@ const Index = () => {
   const [activeUsers, setActiveUsers] = useState(32859);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [puzzleIndex, setPuzzleIndex] = useState(0);
+  
+  // Track user puzzle progress
+  const [userIQ, setUserIQ] = useState(100); // Starting IQ score
+  const [puzzleStage, setPuzzleStage] = useState<'daily' | 'custom' | 'complete'>('daily');
+  const [showCompletionScreen, setShowCompletionScreen] = useState(false);
+  const [treesEarned, setTreesEarned] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
-  const currentPuzzle = puzzles[puzzleIndex % puzzles.length];
+  // Get today's puzzles
+  const getTodaysDailyPuzzle = () => {
+    // In a real app, we would use the date to select a deterministic daily puzzle
+    const today = new Date();
+    const index = (today.getFullYear() + today.getDate() + today.getMonth()) % dailyPuzzles.length;
+    return dailyPuzzles[index];
+  };
+  
+  const getCustomPuzzleForUser = () => {
+    // Determine difficulty level based on user's IQ
+    let difficultyLevel = 1; // Default easy
+    
+    if (userIQ >= 140) difficultyLevel = 4; // Very hard
+    else if (userIQ >= 120) difficultyLevel = 3; // Hard
+    else if (userIQ >= 100) difficultyLevel = 2; // Medium
+    
+    // Get puzzles that match this difficulty
+    const matchingPuzzles = customPuzzles.filter(p => p.difficultyLevel === difficultyLevel);
+    // Select a random puzzle from the matching difficulty
+    return matchingPuzzles[Math.floor(Math.random() * matchingPuzzles.length)];
+  };
+  
+  // Get the current puzzle based on stage
+  const currentPuzzle = puzzleStage === 'daily' 
+    ? getTodaysDailyPuzzle() 
+    : getCustomPuzzleForUser();
   
   const handleStartPuzzle = () => {
     setShowEntry(false);
@@ -36,40 +106,15 @@ const Index = () => {
     // After entry screen fades out, show the puzzle screen
     setTimeout(() => {
       setShowPuzzleContent(true);
-      
-      // Start typewriter animation for text puzzles
-      if (currentPuzzle.type === 'text') {
-        setTimeout(() => {
-          setIsTextAnimating(true);
-        }, 500);
-      }
-    }, 400);
-  };
-  
-  // Handle changing to the previous or next puzzle
-  const handleChangePuzzle = (direction: 'prev' | 'next') => {
-    const newIndex = direction === 'next' 
-      ? (puzzleIndex + 1) % puzzles.length 
-      : (puzzleIndex - 1 + puzzles.length) % puzzles.length;
-    
-    setShowPuzzleContent(false);
-    setIsTextAnimating(false);
-    
-    setTimeout(() => {
-      setPuzzleIndex(newIndex);
+      setPuzzleStage('daily');
       setAvailableHints(3);
       setCurrentHint(undefined);
       setIsAnswerCorrect(null);
-      setIsDisabled(false);
       
-      setShowPuzzleContent(true);
-      
-      // Start typewriter animation for text puzzles
-      if (puzzles[newIndex].type === 'text') {
-        setTimeout(() => {
-          setIsTextAnimating(true);
-        }, 500);
-      }
+      // Start typewriter animation
+      setTimeout(() => {
+        setIsTextAnimating(true);
+      }, 500);
     }, 400);
   };
   
@@ -90,32 +135,45 @@ const Index = () => {
     }
   };
   
-  const handlePuzzleSolved = () => {
-    // Similar handling as submit answer but specifically for interactive puzzles
-    setIsAnswerCorrect(true);
-    setIsDisabled(true);
+  const transitionToNextStage = (treesEarned: number) => {
+    // Hide the puzzle content
+    setShowPuzzleContent(false);
+    setIsTextAnimating(false);
     
-    // Increase tree count on correct solution
-    const treeIncrement = Math.floor(5 + Math.random() * 10);
-    setTimeout(() => {
-      setTreesToday(prev => prev + treeIncrement);
-      setTreesTotal(prev => prev + treeIncrement);
-      setShowConfetti(true);
+    // Show completion screen with trees earned
+    setTreesEarned(treesEarned);
+    setShowCompletionScreen(true);
+    
+    // Update total trees
+    setTreesToday(prev => prev + treesEarned);
+    setTreesTotal(prev => prev + treesEarned);
+  };
+  
+  const handleContinueFromCompletion = () => {
+    // Hide completion screen
+    setShowCompletionScreen(false);
+    
+    // Determine next stage
+    if (puzzleStage === 'daily') {
+      // Move to custom puzzle
+      setPuzzleStage('custom');
       
-      toast({
-        title: "Puzzle Solved!",
-        description: `You planted ${treeIncrement} trees! 🌱`,
-        variant: "default"
-      });
-    }, 500);
-    
-    // Reset after celebration
-    setTimeout(() => {
-      setIsDisabled(false);
-      setIsAnswerCorrect(null);
-      setShowConfetti(false);
-      handleChangePuzzle('next');
-    }, 3000);
+      // After a brief pause, show the next puzzle
+      setTimeout(() => {
+        setAvailableHints(3);
+        setCurrentHint(undefined);
+        setIsAnswerCorrect(null);
+        setShowPuzzleContent(true);
+        
+        // Start typewriter animation
+        setTimeout(() => {
+          setIsTextAnimating(true);
+        }, 500);
+      }, 400);
+    } else {
+      // User has completed both puzzles for the day
+      setPuzzleStage('complete');
+    }
   };
   
   const handleSubmitAnswer = (answer: string) => {
@@ -127,36 +185,46 @@ const Index = () => {
     setIsDisabled(true);
     
     if (correct) {
-      // Increase tree count on correct answer
-      const treeIncrement = Math.floor(5 + Math.random() * 10);
+      // Calculate trees earned based on:
+      // 1. Base amount (5 trees)
+      // 2. If it's a custom puzzle, bonus based on difficulty level
+      // 3. Remaining hints (each unused hint = +1 tree)
+      let treeIncrement = 5; // Base amount
+      
+      // Add bonus for custom puzzle difficulty
+      if (puzzleStage === 'custom' && currentPuzzle.difficultyLevel) {
+        treeIncrement += currentPuzzle.difficultyLevel * 2;
+      }
+      
+      // Add bonus for unused hints
+      treeIncrement += availableHints;
+      
+      // Adjust IQ based on performance (faster answer, fewer hints = higher IQ boost)
+      if (puzzleStage === 'custom') {
+        const iqBoost = Math.floor((availableHints + 1) * 2); // +2 to +6 IQ points
+        setUserIQ(prev => prev + iqBoost);
+      }
+      
+      // Show success feedback
       setTimeout(() => {
-        setTreesToday(prev => prev + treeIncrement);
-        setTreesTotal(prev => prev + treeIncrement);
         setShowConfetti(true);
         
         toast({
           title: "Correct Answer!",
-          description: `You planted ${treeIncrement} trees! 🌱`,
+          description: `You earned ${treeIncrement} trees! 🌱`,
           variant: "default"
         });
-      }, 500);
-      
-      // Reset after celebration
-      setTimeout(() => {
-        setIsDisabled(false);
-        setIsAnswerCorrect(null);
-        setShowConfetti(false);
         
-        // Reset to entry screen and change to next puzzle
-        setShowPuzzleContent(false);
-        setIsTextAnimating(false);
+        // After celebration
         setTimeout(() => {
-          setPuzzleIndex(prev => (prev + 1) % puzzles.length);
-          setAvailableHints(3);
-          setCurrentHint(undefined);
-          setShowEntry(true);
-        }, 400);
-      }, 3000);
+          setIsDisabled(false);
+          setIsAnswerCorrect(null);
+          setShowConfetti(false);
+          
+          // Transition to completion screen or next puzzle
+          transitionToNextStage(treeIncrement);
+        }, 3000);
+      }, 500);
     } else {
       // Reset after wrong answer
       setTimeout(() => {
@@ -169,6 +237,11 @@ const Index = () => {
         description: "Try again or use a hint!",
         variant: "destructive"
       });
+      
+      // Small IQ reduction for wrong answers on custom puzzles
+      if (puzzleStage === 'custom') {
+        setUserIQ(prev => Math.max(80, prev - 1)); // Prevent IQ from going below 80
+      }
     }
   };
 
@@ -176,6 +249,25 @@ const Index = () => {
     return (
       <TooltipProvider>
         <EntryScreen onStartPuzzle={handleStartPuzzle} />
+      </TooltipProvider>
+    );
+  }
+  
+  if (showCompletionScreen) {
+    return (
+      <TooltipProvider>
+        <div className="min-h-screen flex flex-col">
+          <AppBar />
+          <div className="flex-grow flex items-center justify-center">
+            <CompletionScreen 
+              treesEarned={treesEarned}
+              puzzleType={puzzleStage}
+              onContinue={handleContinueFromCompletion}
+              isComplete={puzzleStage === 'custom'}
+            />
+          </div>
+          <AdRail />
+        </div>
       </TooltipProvider>
     );
   }
@@ -190,15 +282,10 @@ const Index = () => {
         </div>
         
         <PuzzleCard 
-          puzzleType={currentPuzzle.type} 
+          puzzleType="text"
           puzzleContent={currentPuzzle.content}
-          puzzleImage={currentPuzzle.type === 'visual' ? currentPuzzle.image : undefined}
           isAnimating={isTextAnimating}
-          puzzleIndex={puzzleIndex}
-          totalPuzzles={puzzles.length}
-          onChangeIndex={handleChangePuzzle}
-          puzzlePieces={currentPuzzle.pieces}
-          onPuzzleSolved={currentPuzzle.type === 'interactive' ? handlePuzzleSolved : undefined}
+          puzzleStage={puzzleStage}
         />
         
         <HintSystem 
@@ -208,20 +295,19 @@ const Index = () => {
           currentHint={currentHint}
         />
         
-        {currentPuzzle.type !== 'interactive' && (
-          <AnswerInput 
-            puzzleType={currentPuzzle.type}
-            onSubmit={handleSubmitAnswer}
-            isCorrect={isAnswerCorrect}
-            isDisabled={isDisabled}
-          />
-        )}
+        <AnswerInput 
+          puzzleType="text"
+          onSubmit={handleSubmitAnswer}
+          isCorrect={isAnswerCorrect}
+          isDisabled={isDisabled}
+        />
         
         <ImpactStats 
           treesToday={treesToday}
           treesTotal={treesTotal}
           activeUsers={activeUsers}
           animateIncrease={true}
+          userIQ={userIQ}
         />
         
         <AdRail />
