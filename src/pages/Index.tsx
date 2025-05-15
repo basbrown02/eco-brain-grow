@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import AppBar from '@/components/AppBar';
 import PuzzleCard from '@/components/PuzzleCard';
@@ -9,6 +10,8 @@ import Confetti from '@/components/Confetti';
 import BrainIcon from '@/components/BrainIcon';
 import EntryScreen from '@/components/EntryScreen';
 import AnswerRevealScreen from '@/components/AnswerRevealScreen';
+import TreePlantingAnimation from '@/components/TreePlantingAnimation';
+import CongratulationsScreen from '@/components/CongratulationsScreen';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { dailyPuzzles, customPuzzles } from '@/data/puzzles';
@@ -66,12 +69,17 @@ const Index = () => {
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   
+  // Tree planting animation states
+  const [plantingStage, setPlantingStage] = useState<'seed' | 'watering' | 'growing' | null>(null);
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  
   // Track user puzzle progress
   const [userIQ, setUserIQ] = useState(100); // Starting IQ score
   const [puzzleStage, setPuzzleStage] = useState<'daily' | 'custom' | 'complete'>('daily');
   const [showCompletionScreen, setShowCompletionScreen] = useState(false);
   const [showAnswerScreen, setShowAnswerScreen] = useState(false);
   const [treesEarned, setTreesEarned] = useState(0);
+  const [totalTreesEarned, setTotalTreesEarned] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
   // Get today's puzzles
@@ -169,22 +177,46 @@ const Index = () => {
     } else {
       // User has completed both puzzles for the day
       setPuzzleStage('complete');
-      setShowCompletionScreen(true);
+      setShowCongratulations(true);
     }
   };
+
+  const handlePlantingAnimationComplete = () => {
+    setPlantingStage(null);
+    
+    // After animation completes, show completion screen or congratulations
+    setTimeout(() => {
+      if (puzzleStage === 'custom') {
+        // Show final congratulations after the growing animation
+        setShowCongratulations(true);
+      } else {
+        // Show completion screen with trees earned
+        setShowCompletionScreen(true);
+      }
+    }, 500);
+  };
   
-  const transitionToNextStage = (treesEarned: number) => {
+  const transitionToNextStage = (treeIncrement: number) => {
     // Hide the puzzle content
     setShowPuzzleContent(false);
     setIsTextAnimating(false);
     
-    // Show completion screen with trees earned
-    setTreesEarned(treesEarned);
-    setShowCompletionScreen(true);
+    // Update total trees earned
+    setTotalTreesEarned(prev => prev + treeIncrement);
+    
+    // Store trees earned for this puzzle
+    setTreesEarned(treeIncrement);
+    
+    // Start tree planting animation based on puzzle stage
+    if (puzzleStage === 'daily') {
+      setPlantingStage('seed');
+    } else {
+      setPlantingStage('watering');
+    }
     
     // Update total trees
-    setTreesToday(prev => prev + treesEarned);
-    setTreesTotal(prev => prev + treesEarned);
+    setTreesToday(prev => prev + treeIncrement);
+    setTreesTotal(prev => prev + treeIncrement);
   };
   
   const handleContinueFromCompletion = () => {
@@ -211,7 +243,18 @@ const Index = () => {
     } else {
       // User has completed both puzzles for the day
       setPuzzleStage('complete');
+      
+      // Show growing tree animation before final congratulations
+      setPlantingStage('growing');
     }
+  };
+
+  const handleContinueFromCongratulations = () => {
+    // Redirect to home/entry screen
+    setShowCongratulations(false);
+    setShowEntry(true);
+    setPuzzleStage('daily');
+    setTotalTreesEarned(0);
   };
   
   const handleSubmitAnswer = (answer: string) => {
@@ -287,6 +330,23 @@ const Index = () => {
     return (
       <TooltipProvider>
         <EntryScreen onStartPuzzle={handleStartPuzzle} />
+      </TooltipProvider>
+    );
+  }
+
+  if (showCongratulations) {
+    return (
+      <TooltipProvider>
+        <div className="min-h-screen flex flex-col">
+          <AppBar />
+          <div className="flex-grow flex items-center justify-center">
+            <CongratulationsScreen 
+              treesEarned={totalTreesEarned}
+              onContinue={handleContinueFromCongratulations}
+            />
+          </div>
+          <AdRail />
+        </div>
       </TooltipProvider>
     );
   }
@@ -371,6 +431,10 @@ const Index = () => {
         
         <AdRail />
         <Confetti active={showConfetti} />
+        <TreePlantingAnimation 
+          stage={plantingStage} 
+          onComplete={handlePlantingAnimationComplete} 
+        />
       </div>
     </TooltipProvider>
   );
