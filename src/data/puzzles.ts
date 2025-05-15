@@ -1,4 +1,3 @@
-
 export interface Puzzle {
   type: 'text' | 'visual' | 'interactive';
   content: string;
@@ -30,11 +29,11 @@ const puzzles: Puzzle[] = [
       "Group similar sized pieces together."
     ],
     pieces: [
-      { id: "piece1", x: 50, y: 50, width: 60, height: 60 },
-      { id: "piece2", x: 120, y: 50, width: 60, height: 60 },
-      { id: "piece3", x: 50, y: 120, width: 60, height: 60 },
-      { id: "piece4", x: 120, y: 120, width: 60, height: 60 },
-      { id: "piece5", x: 190, y: 85, width: 60, height: 60 }
+      { id: "piece1", x: 10, y: 10, width: 70, height: 70 },
+      { id: "piece2", x: 90, y: 10, width: 70, height: 70 },
+      { id: "piece3", x: 170, y: 10, width: 70, height: 70 },
+      { id: "piece4", x: 40, y: 90, width: 70, height: 70 },
+      { id: "piece5", x: 120, y: 90, width: 70, height: 70 }
     ]
   },
   {

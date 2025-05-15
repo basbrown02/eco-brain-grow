@@ -59,6 +59,7 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
 
   // Handle mouse/touch down on a puzzle piece
   const handlePieceDown = (id: string, e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault(); // Prevent default behavior
     setActivePiece(id);
     
     // Get current position
@@ -72,6 +73,8 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
   const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!activePiece || !containerRef.current) return;
     
+    e.preventDefault(); // Prevent scrolling on mobile
+    
     // Get current position
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
@@ -84,6 +87,7 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
     setPieces(pieces.map(piece => {
       if (piece.id === activePiece) {
         const containerRect = containerRef.current!.getBoundingClientRect();
+        // Ensure pieces stay within container boundaries
         const newX = Math.max(0, Math.min(containerRect.width - piece.width, piece.x + deltaX));
         const newY = Math.max(0, Math.min(containerRect.height - piece.height, piece.y + deltaY));
         
@@ -126,7 +130,7 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[80%] mx-auto bg-white rounded-lg shadow-sm p-6 mb-6 relative">
+    <div className="w-full max-w-[90%] sm:max-w-[80%] mx-auto bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6 relative">
       <div className="flex justify-between items-center mb-4">
         <Button 
           variant="ghost" 
@@ -163,8 +167,8 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
         <div 
           className="w-full aspect-square mb-4 bg-gray-100 rounded-md flex items-center justify-center relative overflow-hidden"
           ref={containerRef}
-          onMouseMove={handlePointerMove}
-          onTouchMove={handlePointerMove}
+          onMouseMove={activePiece ? handlePointerMove : undefined}
+          onTouchMove={activePiece ? handlePointerMove : undefined}
           onMouseUp={handlePointerUp}
           onMouseLeave={handlePointerUp}
           onTouchEnd={handlePointerUp}
@@ -172,11 +176,11 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
           <div className="absolute top-2 right-2 z-10">
             <Button 
               size="sm" 
-              variant="ghost" 
+              variant="outline"
               onClick={resetPuzzle}
-              className="bg-white/80 hover:bg-white"
+              className="bg-white/80 hover:bg-white flex items-center gap-1 text-sm py-1 px-3 h-8"
             >
-              <RotateCcw className="h-4 w-4 mr-1" />
+              <RotateCcw className="h-4 w-4" />
               Reset
             </Button>
           </div>
@@ -184,7 +188,7 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
           {pieces.map((piece) => (
             <div
               key={piece.id}
-              className="absolute bg-black cursor-move select-none"
+              className="absolute bg-black cursor-move select-none touch-none"
               style={{
                 left: `${piece.x}px`,
                 top: `${piece.y}px`,
@@ -200,8 +204,8 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
             />
           ))}
           
-          <div className="text-center p-4 absolute bottom-0 left-0 right-0 bg-white/75">
-            {puzzleContent}
+          <div className="text-center p-2 sm:p-4 absolute bottom-0 left-0 right-0 bg-white/90">
+            <p className="text-sm sm:text-base">{puzzleContent}</p>
           </div>
         </div>
       )}
