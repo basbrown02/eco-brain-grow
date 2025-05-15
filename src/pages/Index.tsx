@@ -1,61 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
 import AppBar from '@/components/AppBar';
-import PuzzleCard from '@/components/PuzzleCard';
-import HintSystem from '@/components/HintSystem';
-import AnswerInput from '@/components/AnswerInput';
-import ImpactStats from '@/components/ImpactStats';
 import AdRail from '@/components/AdRail';
 import Confetti from '@/components/Confetti';
-import BrainIcon from '@/components/BrainIcon';
 import EntryScreen from '@/components/EntryScreen';
 import AnswerRevealScreen from '@/components/AnswerRevealScreen';
 import TreePlantingAnimation from '@/components/TreePlantingAnimation';
 import CongratulationsScreen from '@/components/CongratulationsScreen';
 import SeedPlantedScreen from '@/components/SeedPlantedScreen';
+import CompletionScreen from '@/components/CompletionScreen';
+import PuzzleContent from '@/components/PuzzleContent';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { dailyPuzzles, customPuzzles } from '@/data/puzzles';
-
-// New component to show completion screen between puzzles
-const CompletionScreen: React.FC<{ 
-  treesEarned: number,
-  puzzleType: string,
-  onContinue: () => void,
-  isComplete?: boolean
-}> = ({ treesEarned, puzzleType, onContinue, isComplete = false }) => {
-  return (
-    <div className="min-h-[50vh] flex flex-col items-center justify-center animate-fade-in">
-      <BrainIcon className="w-16 h-16 opacity-80 mb-6" />
-      
-      <h2 className="text-2xl font-bold text-ecobrain-charcoal mb-4">
-        {isComplete ? "All Done for Today!" : "Great Job!"}
-      </h2>
-      
-      <div className="mb-6 text-center">
-        <p className="mb-2">You earned <span className="text-ecobrain-green font-bold">{treesEarned} trees</span>!</p>
-        {!isComplete && (
-          <p className="text-ecobrain-charcoal/80">
-            Now it's time for your {puzzleType === 'daily' ? 'personalized' : 'final'} puzzle
-          </p>
-        )}
-      </div>
-      
-      {!isComplete ? (
-        <button 
-          onClick={onContinue}
-          className="bg-ecobrain-green hover:bg-ecobrain-green/90 text-white px-6 py-3 rounded-full text-lg hover:scale-105 transition-all"
-        >
-          Continue
-        </button>
-      ) : (
-        <p className="text-ecobrain-charcoal/80 text-center max-w-xs">
-          Come back tomorrow for a new daily puzzle and continue your streak!
-        </p>
-      )}
-    </div>
-  );
-};
+import { getTodaysDailyPuzzle, getCustomPuzzleForUser } from '@/utils/puzzleUtils';
 
 const Index = () => {
   const { toast } = useToast();
@@ -90,32 +47,10 @@ const Index = () => {
   const [totalTreesEarned, setTotalTreesEarned] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
-  // Get today's puzzles
-  const getTodaysDailyPuzzle = () => {
-    // In a real app, we would use the date to select a deterministic daily puzzle
-    const today = new Date();
-    const index = (today.getFullYear() + today.getDate() + today.getMonth()) % dailyPuzzles.length;
-    return dailyPuzzles[index];
-  };
-  
-  const getCustomPuzzleForUser = () => {
-    // Determine difficulty level based on user's IQ
-    let difficultyLevel = 1; // Default easy
-    
-    if (userIQ >= 140) difficultyLevel = 4; // Very hard
-    else if (userIQ >= 120) difficultyLevel = 3; // Hard
-    else if (userIQ >= 100) difficultyLevel = 2; // Medium
-    
-    // Get puzzles that match this difficulty
-    const matchingPuzzles = customPuzzles.filter(p => p.difficultyLevel === difficultyLevel);
-    // Select a random puzzle from the matching difficulty
-    return matchingPuzzles[Math.floor(Math.random() * matchingPuzzles.length)];
-  };
-  
   // Get the current puzzle based on stage
   const currentPuzzle = puzzleStage === 'daily' 
     ? getTodaysDailyPuzzle() 
-    : getCustomPuzzleForUser();
+    : getCustomPuzzleForUser(userIQ);
   
   const handleStartPuzzle = () => {
     setShowEntry(false);
@@ -340,6 +275,7 @@ const Index = () => {
     }
   };
 
+  // Render appropriate screen based on app state
   if (showEntry) {
     return (
       <TooltipProvider>
@@ -425,41 +361,24 @@ const Index = () => {
       <div className={`min-h-screen flex flex-col relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
         <AppBar />
         
-        <div className="flex justify-center my-2">
-          <BrainIcon className="opacity-80" />
-        </div>
-        
-        <div className="flex-grow">
-          <PuzzleCard 
-            puzzleType="text"
+        {showPuzzleContent && (
+          <PuzzleContent
             puzzleContent={currentPuzzle.content}
-            isAnimating={isTextAnimating}
+            isTextAnimating={isTextAnimating}
             puzzleStage={puzzleStage}
-          />
-          
-          <HintSystem 
-            totalHints={3}
             availableHints={availableHints}
-            onUseHint={handleUseHint}
             currentHint={currentHint}
-            onShowAnswer={handleShowAnswer}
-          />
-          
-          <AnswerInput 
-            puzzleType="text"
-            onSubmit={handleSubmitAnswer}
-            isCorrect={isAnswerCorrect}
+            handleUseHint={handleUseHint}
+            handleShowAnswer={handleShowAnswer}
+            handleSubmitAnswer={handleSubmitAnswer}
+            isAnswerCorrect={isAnswerCorrect}
             isDisabled={isDisabled}
-          />
-          
-          <ImpactStats 
             treesToday={treesToday}
             treesTotal={treesTotal}
             activeUsers={activeUsers}
-            animateIncrease={true}
             userIQ={userIQ}
           />
-        </div>
+        )}
         
         <AdRail />
         <Confetti active={showConfetti} />
