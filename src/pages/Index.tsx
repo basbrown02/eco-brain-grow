@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AppBar from '@/components/AppBar';
 import PuzzleCard from '@/components/PuzzleCard';
@@ -11,32 +10,9 @@ import BrainIcon from '@/components/BrainIcon';
 import EntryScreen from '@/components/EntryScreen';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import puzzles from '@/data/puzzles';
 
 // Sample puzzles
-const puzzles = [
-  {
-    type: 'text' as const,
-    content: "I'm tall when I'm young, and short when I'm old. What am I?",
-    answer: "candle",
-    hints: [
-      "You might find me on a birthday cake.",
-      "I provide light.",
-      "I melt as I'm used."
-    ]
-  },
-  {
-    type: 'visual' as const,
-    content: "Identify the pattern and select the next shape.",
-    image: "/placeholder.svg",
-    answer: "circle",
-    hints: [
-      "Look at the number of sides.",
-      "The pattern decreases by one side each time.",
-      "After a triangle comes a..."
-    ]
-  }
-];
-
 const Index = () => {
   const { toast } = useToast();
   const [showEntry, setShowEntry] = useState(true);
@@ -52,7 +28,9 @@ const Index = () => {
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
-  const currentPuzzle = puzzles[puzzleIndex];
+  // Get today's puzzle (or a random one)
+  // We could use the date to select a different puzzle each day
+  const currentPuzzle = puzzles[puzzleIndex % puzzles.length];
   
   const handleStartPuzzle = () => {
     setShowEntry(false);
