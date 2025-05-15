@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AppBar from '@/components/AppBar';
 import AdRail from '@/components/AdRail';
@@ -10,9 +9,11 @@ import CongratulationsScreen from '@/components/CongratulationsScreen';
 import SeedPlantedScreen from '@/components/SeedPlantedScreen';
 import CompletionScreen from '@/components/CompletionScreen';
 import PuzzleContent from '@/components/PuzzleContent';
+import AppBarContent from '@/components/AppBarContent';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getTodaysDailyPuzzle, getCustomPuzzleForUser } from '@/utils/puzzleUtils';
+import { hasValidApiKey } from '@/utils/geminiApi';
 
 const Index = () => {
   const { toast } = useToast();
@@ -26,6 +27,10 @@ const Index = () => {
   const [activeUsers, setActiveUsers] = useState(32859);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  
+  // Current puzzle state
+  const [currentPuzzle, setCurrentPuzzle] = useState<any>(null);
+  const [isLoadingPuzzle, setIsLoadingPuzzle] = useState(false);
   
   // Tree planting animation states
   const [plantingStage, setPlantingStage] = useState<'seed' | 'watering' | 'growing' | null>(null);
@@ -47,10 +52,47 @@ const Index = () => {
   const [totalTreesEarned, setTotalTreesEarned] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
-  // Get the current puzzle based on stage
-  const currentPuzzle = puzzleStage === 'daily' 
-    ? getTodaysDailyPuzzle() 
-    : getCustomPuzzleForUser(userIQ);
+  // Load today's daily puzzle when the app starts
+  useEffect(() => {
+    const loadInitialPuzzle = async () => {
+      if (!currentPuzzle && puzzleStage === 'daily') {
+        setCurrentPuzzle(await getTodaysDailyPuzzle());
+      }
+    };
+    
+    loadInitialPuzzle();
+    
+    // Check if API key exists and show toast if not
+    if (!hasValidApiKey()) {
+      setTimeout(() => {
+        toast({
+          title: "Gemini API Key Missing",
+          description: "Set your Gemini API key in the top bar to get unique puzzles.",
+          duration: 6000,
+        });
+      }, 2000);
+    }
+  }, []);
+  
+  // Load the appropriate puzzle when puzzle stage changes
+  useEffect(() => {
+    const loadPuzzle = async () => {
+      setIsLoadingPuzzle(true);
+      try {
+        if (puzzleStage === 'daily') {
+          setCurrentPuzzle(await getTodaysDailyPuzzle());
+        } else if (puzzleStage === 'custom') {
+          setCurrentPuzzle(await getCustomPuzzleForUser(userIQ));
+        }
+      } catch (error) {
+        console.error("Error loading puzzle:", error);
+      } finally {
+        setIsLoadingPuzzle(false);
+      }
+    };
+    
+    loadPuzzle();
+  }, [puzzleStage, userIQ]);
   
   const handleStartPuzzle = () => {
     setShowEntry(false);
@@ -74,7 +116,7 @@ const Index = () => {
     if (availableHints <= 0) return;
     
     const hintIndex = 3 - availableHints;
-    if (currentPuzzle.hints[hintIndex]) {
+    if (currentPuzzle && currentPuzzle.hints && currentPuzzle.hints[hintIndex]) {
       setCurrentHint(currentPuzzle.hints[hintIndex]);
       setAvailableHints(prev => prev - 1);
       
@@ -206,6 +248,8 @@ const Index = () => {
   };
   
   const handleSubmitAnswer = (answer: string) => {
+    if (!currentPuzzle) return;
+    
     const normalizedUserAnswer = answer.trim().toLowerCase();
     const normalizedCorrectAnswer = currentPuzzle.answer.toLowerCase();
     
@@ -288,7 +332,9 @@ const Index = () => {
     return (
       <TooltipProvider>
         <div className="min-h-screen flex flex-col">
-          <AppBar />
+          <AppBar>
+            <AppBarContent />
+          </AppBar>
           <div className="flex-grow flex items-center justify-center pb-20">
             <CongratulationsScreen 
               treesEarned={userTreesTotal}
@@ -309,7 +355,9 @@ const Index = () => {
     return (
       <TooltipProvider>
         <div className="min-h-screen flex flex-col">
-          <AppBar />
+          <AppBar>
+            <AppBarContent />
+          </AppBar>
           <div className="flex-grow flex items-center justify-center pb-20">
             <SeedPlantedScreen onContinue={handleContinueFromSeedPlanted} />
           </div>
@@ -323,7 +371,9 @@ const Index = () => {
     return (
       <TooltipProvider>
         <div className="min-h-screen flex flex-col">
-          <AppBar />
+          <AppBar>
+            <AppBarContent />
+          </AppBar>
           <div className="flex-grow flex items-center justify-center pb-[90px]">
             <CompletionScreen 
               treesEarned={treesEarned}
@@ -338,11 +388,13 @@ const Index = () => {
     );
   }
 
-  if (showAnswerScreen) {
+  if (showAnswerScreen && currentPuzzle) {
     return (
       <TooltipProvider>
         <div className="min-h-screen flex flex-col">
-          <AppBar />
+          <AppBar>
+            <AppBarContent />
+          </AppBar>
           <div className="flex-grow flex items-center justify-center pb-20">
             <AnswerRevealScreen
               answer={currentPuzzle.answer}
@@ -359,9 +411,11 @@ const Index = () => {
   return (
     <TooltipProvider>
       <div className={`min-h-screen flex flex-col relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
-        <AppBar />
+        <AppBar>
+          <AppBarContent />
+        </AppBar>
         
-        {showPuzzleContent && (
+        {showPuzzleContent && currentPuzzle && (
           <PuzzleContent
             puzzleContent={currentPuzzle.content}
             isTextAnimating={isTextAnimating}
@@ -372,7 +426,7 @@ const Index = () => {
             handleShowAnswer={handleShowAnswer}
             handleSubmitAnswer={handleSubmitAnswer}
             isAnswerCorrect={isAnswerCorrect}
-            isDisabled={isDisabled}
+            isDisabled={isDisabled || isLoadingPuzzle}
             treesToday={treesToday}
             treesTotal={treesTotal}
             activeUsers={activeUsers}
