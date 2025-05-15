@@ -3,6 +3,7 @@ import React from 'react';
 import { TreeDeciduous, Share, Award, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BrainIcon from '@/components/BrainIcon';
+import { Link } from 'react-router-dom';
 
 interface CongratulationsScreenProps {
   treesEarned: number;
@@ -93,6 +94,14 @@ const CongratulationsScreen: React.FC<CongratulationsScreenProps> = ({
         >
           Continue
         </Button>
+        
+        <Link to="/pricing" className="mt-4">
+          <Button
+            className="bg-ecobrain-green/10 hover:bg-ecobrain-green/20 text-ecobrain-green border border-ecobrain-green/30 px-6 py-3"
+          >
+            Want to plant more trees?
+          </Button>
+        </Link>
       </div>
     </div>
   );
