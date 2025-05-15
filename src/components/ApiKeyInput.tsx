@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { setGeminiApiKey, getGeminiApiKey } from '@/utils/geminiApi';
@@ -8,8 +8,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 const ApiKeyInput = () => {
   const { toast } = useToast();
-  const [apiKey, setApiKey] = useState(getGeminiApiKey() || '');
+  const DEFAULT_API_KEY = "AIzaSyAzRWtgC9AqcdKfIvmuJh5NoedFMLz5L-o";
+  const [apiKey, setApiKey] = useState(getGeminiApiKey() || DEFAULT_API_KEY);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Set the default API key when component first loads
+  useEffect(() => {
+    if (!getGeminiApiKey()) {
+      setGeminiApiKey(DEFAULT_API_KEY);
+      toast({
+        title: "API Key Set",
+        description: "Default Gemini API key has been applied",
+      });
+    }
+  }, []);
 
   const handleSave = () => {
     if (!apiKey.trim()) {
