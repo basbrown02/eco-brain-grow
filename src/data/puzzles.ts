@@ -1,10 +1,11 @@
 
 export interface Puzzle {
-  type: 'text' | 'visual';
+  type: 'text' | 'visual' | 'interactive';
   content: string;
   image?: string;
   answer: string;
   hints: string[];
+  pieces?: {id: string, x: number, y: number, width: number, height: number}[];
 }
 
 const puzzles: Puzzle[] = [
@@ -19,14 +20,21 @@ const puzzles: Puzzle[] = [
     ]
   },
   {
-    type: 'visual',
-    content: "Identify the pattern and select the next shape.",
-    image: "/placeholder.svg",
-    answer: "circle",
+    type: 'interactive',
+    content: "Re-arrange this into a cube by swiping the mini-cubes. Can you figure it out?",
+    image: "/lovable-uploads/bfadd6c8-a83f-4b3a-9210-85e269d18fbe.png",
+    answer: "cube",
     hints: [
-      "Look at the number of sides.",
-      "The pattern decreases by one side each time.",
-      "After a triangle comes a..."
+      "Try to visualize the final 3D shape.",
+      "Focus on creating a perfect cube with all pieces.",
+      "Group similar sized pieces together."
+    ],
+    pieces: [
+      { id: "piece1", x: 50, y: 50, width: 60, height: 60 },
+      { id: "piece2", x: 120, y: 50, width: 60, height: 60 },
+      { id: "piece3", x: 50, y: 120, width: 60, height: 60 },
+      { id: "piece4", x: 120, y: 120, width: 60, height: 60 },
+      { id: "piece5", x: 190, y: 85, width: 60, height: 60 }
     ]
   },
   {
@@ -37,6 +45,23 @@ const puzzles: Puzzle[] = [
       "You use me after a shower.",
       "I'm made of absorbent material.",
       "I remove moisture from surfaces."
+    ]
+  },
+  {
+    type: 'interactive',
+    content: "Arrange the blocks to form the correct pattern",
+    answer: "pattern",
+    hints: [
+      "Look for symmetry in the design.",
+      "The pattern has rotational properties.",
+      "Try to align similar shapes together."
+    ],
+    pieces: [
+      { id: "piece1", x: 50, y: 80, width: 70, height: 70 },
+      { id: "piece2", x: 130, y: 80, width: 70, height: 70 },
+      { id: "piece3", x: 210, y: 80, width: 70, height: 70 },
+      { id: "piece4", x: 90, y: 160, width: 70, height: 70 },
+      { id: "piece5", x: 170, y: 160, width: 70, height: 70 }
     ]
   },
   {

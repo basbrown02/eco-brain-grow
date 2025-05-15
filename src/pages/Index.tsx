@@ -90,6 +90,34 @@ const Index = () => {
     }
   };
   
+  const handlePuzzleSolved = () => {
+    // Similar handling as submit answer but specifically for interactive puzzles
+    setIsAnswerCorrect(true);
+    setIsDisabled(true);
+    
+    // Increase tree count on correct solution
+    const treeIncrement = Math.floor(5 + Math.random() * 10);
+    setTimeout(() => {
+      setTreesToday(prev => prev + treeIncrement);
+      setTreesTotal(prev => prev + treeIncrement);
+      setShowConfetti(true);
+      
+      toast({
+        title: "Puzzle Solved!",
+        description: `You planted ${treeIncrement} trees! 🌱`,
+        variant: "default"
+      });
+    }, 500);
+    
+    // Reset after celebration
+    setTimeout(() => {
+      setIsDisabled(false);
+      setIsAnswerCorrect(null);
+      setShowConfetti(false);
+      handleChangePuzzle('next');
+    }, 3000);
+  };
+  
   const handleSubmitAnswer = (answer: string) => {
     const normalizedUserAnswer = answer.trim().toLowerCase();
     const normalizedCorrectAnswer = currentPuzzle.answer.toLowerCase();
@@ -169,6 +197,8 @@ const Index = () => {
           puzzleIndex={puzzleIndex}
           totalPuzzles={puzzles.length}
           onChangeIndex={handleChangePuzzle}
+          puzzlePieces={currentPuzzle.pieces}
+          onPuzzleSolved={currentPuzzle.type === 'interactive' ? handlePuzzleSolved : undefined}
         />
         
         <HintSystem 
@@ -178,12 +208,14 @@ const Index = () => {
           currentHint={currentHint}
         />
         
-        <AnswerInput 
-          puzzleType={currentPuzzle.type}
-          onSubmit={handleSubmitAnswer}
-          isCorrect={isAnswerCorrect}
-          isDisabled={isDisabled}
-        />
+        {currentPuzzle.type !== 'interactive' && (
+          <AnswerInput 
+            puzzleType={currentPuzzle.type}
+            onSubmit={handleSubmitAnswer}
+            isCorrect={isAnswerCorrect}
+            isDisabled={isDisabled}
+          />
+        )}
         
         <ImpactStats 
           treesToday={treesToday}
