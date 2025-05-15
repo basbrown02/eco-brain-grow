@@ -10,6 +10,7 @@ import Confetti from '@/components/Confetti';
 import BrainIcon from '@/components/BrainIcon';
 import EntryScreen from '@/components/EntryScreen';
 import { useToast } from '@/hooks/use-toast';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 // Sample puzzles
 const puzzles = [
@@ -141,48 +142,54 @@ const Index = () => {
   };
 
   if (showEntry) {
-    return <EntryScreen onStartPuzzle={handleStartPuzzle} />;
+    return (
+      <TooltipProvider>
+        <EntryScreen onStartPuzzle={handleStartPuzzle} />
+      </TooltipProvider>
+    );
   }
 
   return (
-    <div className={`min-h-screen flex flex-col pb-[90px] relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
-      <AppBar />
-      
-      <div className="flex justify-center my-2">
-        <BrainIcon className="opacity-80" />
+    <TooltipProvider>
+      <div className={`min-h-screen flex flex-col pb-[90px] relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
+        <AppBar />
+        
+        <div className="flex justify-center my-2">
+          <BrainIcon className="opacity-80" />
+        </div>
+        
+        <PuzzleCard 
+          puzzleType={currentPuzzle.type} 
+          puzzleContent={currentPuzzle.content}
+          puzzleImage={currentPuzzle.type === 'visual' ? currentPuzzle.image : undefined}
+          isAnimating={isTextAnimating}
+        />
+        
+        <HintSystem 
+          totalHints={3}
+          availableHints={availableHints}
+          onUseHint={handleUseHint}
+          currentHint={currentHint}
+        />
+        
+        <AnswerInput 
+          puzzleType={currentPuzzle.type}
+          onSubmit={handleSubmitAnswer}
+          isCorrect={isAnswerCorrect}
+          isDisabled={isDisabled}
+        />
+        
+        <ImpactStats 
+          treesToday={treesToday}
+          treesTotal={treesTotal}
+          activeUsers={activeUsers}
+          animateIncrease={true}
+        />
+        
+        <AdRail />
+        <Confetti active={showConfetti} />
       </div>
-      
-      <PuzzleCard 
-        puzzleType={currentPuzzle.type} 
-        puzzleContent={currentPuzzle.content}
-        puzzleImage={currentPuzzle.type === 'visual' ? currentPuzzle.image : undefined}
-        isAnimating={isTextAnimating}
-      />
-      
-      <HintSystem 
-        totalHints={3}
-        availableHints={availableHints}
-        onUseHint={handleUseHint}
-        currentHint={currentHint}
-      />
-      
-      <AnswerInput 
-        puzzleType={currentPuzzle.type}
-        onSubmit={handleSubmitAnswer}
-        isCorrect={isAnswerCorrect}
-        isDisabled={isDisabled}
-      />
-      
-      <ImpactStats 
-        treesToday={treesToday}
-        treesTotal={treesTotal}
-        activeUsers={activeUsers}
-        animateIncrease={true}
-      />
-      
-      <AdRail />
-      <Confetti active={showConfetti} />
-    </div>
+    </TooltipProvider>
   );
 };
 
