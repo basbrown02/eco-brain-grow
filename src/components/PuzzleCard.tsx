@@ -33,11 +33,29 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
   const [pieces, setPieces] = useState(puzzlePieces);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   // Initialize puzzle pieces when they change
   useEffect(() => {
     setPieces(puzzlePieces);
   }, [puzzlePieces, puzzleIndex]);
+
+  // Track container size for responsive positioning
+  useEffect(() => {
+    const updateContainerSize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setContainerSize({ width, height });
+      }
+    };
+    
+    updateContainerSize();
+    window.addEventListener('resize', updateContainerSize);
+    
+    return () => {
+      window.removeEventListener('resize', updateContainerSize);
+    };
+  }, []);
 
   // Handle mouse/touch down on a puzzle piece
   const handlePieceDown = (id: string, e: React.MouseEvent | React.TouchEvent) => {
@@ -52,7 +70,7 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
 
   // Handle mouse/touch move
   const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!activePiece) return;
+    if (!activePiece || !containerRef.current) return;
     
     // Get current position
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -65,10 +83,14 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
     // Update the position
     setPieces(pieces.map(piece => {
       if (piece.id === activePiece) {
+        const containerRect = containerRef.current!.getBoundingClientRect();
+        const newX = Math.max(0, Math.min(containerRect.width - piece.width, piece.x + deltaX));
+        const newY = Math.max(0, Math.min(containerRect.height - piece.height, piece.y + deltaY));
+        
         return {
           ...piece,
-          x: piece.x + deltaX,
-          y: piece.y + deltaY
+          x: newX,
+          y: newY
         };
       }
       return piece;
@@ -169,7 +191,9 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
                 width: `${piece.width}px`,
                 height: `${piece.height}px`,
                 zIndex: activePiece === piece.id ? 10 : 1,
-                transition: activePiece === piece.id ? 'none' : 'all 0.2s'
+                transition: activePiece === piece.id ? 'none' : 'all 0.2s',
+                maxWidth: '100%',
+                maxHeight: '100%'
               }}
               onMouseDown={(e) => handlePieceDown(piece.id, e)}
               onTouchStart={(e) => handlePieceDown(piece.id, e)}

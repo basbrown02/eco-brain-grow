@@ -15,8 +15,8 @@ import puzzles from '@/data/puzzles';
 
 const Index = () => {
   const { toast } = useToast();
-  const [showEntry, setShowEntry] = useState(false); // Changed to false to show puzzles immediately
-  const [showPuzzleContent, setShowPuzzleContent] = useState(true); // Changed to true to show puzzles immediately
+  const [showEntry, setShowEntry] = useState(true); // Changed back to true to show entry screen
+  const [showPuzzleContent, setShowPuzzleContent] = useState(false); // Changed back to false until entry screen is dismissed
   const [isTextAnimating, setIsTextAnimating] = useState(false);
   const [availableHints, setAvailableHints] = useState(3);
   const [currentHint, setCurrentHint] = useState<string | undefined>(undefined);
