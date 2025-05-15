@@ -8,6 +8,7 @@ import ImpactStats from '@/components/ImpactStats';
 import AdRail from '@/components/AdRail';
 import Confetti from '@/components/Confetti';
 import BrainIcon from '@/components/BrainIcon';
+import EntryScreen from '@/components/EntryScreen';
 import { useToast } from '@/hooks/use-toast';
 
 // Sample puzzles
@@ -37,6 +38,9 @@ const puzzles = [
 
 const Index = () => {
   const { toast } = useToast();
+  const [showEntry, setShowEntry] = useState(true);
+  const [showPuzzleContent, setShowPuzzleContent] = useState(false);
+  const [isTextAnimating, setIsTextAnimating] = useState(false);
   const [availableHints, setAvailableHints] = useState(3);
   const [currentHint, setCurrentHint] = useState<string | undefined>(undefined);
   const [treesToday, setTreesToday] = useState(12453);
@@ -48,6 +52,22 @@ const Index = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   
   const currentPuzzle = puzzles[puzzleIndex];
+  
+  const handleStartPuzzle = () => {
+    setShowEntry(false);
+    
+    // After entry screen fades out, show the puzzle screen
+    setTimeout(() => {
+      setShowPuzzleContent(true);
+      
+      // Start typewriter animation for text puzzles
+      if (currentPuzzle.type === 'text') {
+        setTimeout(() => {
+          setIsTextAnimating(true);
+        }, 500);
+      }
+    }, 400);
+  };
   
   const handleUseHint = () => {
     if (availableHints <= 0) return;
@@ -95,10 +115,15 @@ const Index = () => {
         setIsAnswerCorrect(null);
         setShowConfetti(false);
         
-        // Change to next puzzle
-        setPuzzleIndex(prev => (prev + 1) % puzzles.length);
-        setAvailableHints(3);
-        setCurrentHint(undefined);
+        // Reset to entry screen and change to next puzzle
+        setShowPuzzleContent(false);
+        setIsTextAnimating(false);
+        setTimeout(() => {
+          setPuzzleIndex(prev => (prev + 1) % puzzles.length);
+          setAvailableHints(3);
+          setCurrentHint(undefined);
+          setShowEntry(true);
+        }, 400);
       }, 3000);
     } else {
       // Reset after wrong answer
@@ -115,8 +140,12 @@ const Index = () => {
     }
   };
 
+  if (showEntry) {
+    return <EntryScreen onStartPuzzle={handleStartPuzzle} />;
+  }
+
   return (
-    <div className="min-h-screen flex flex-col pb-[90px] relative">
+    <div className={`min-h-screen flex flex-col pb-[90px] relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
       <AppBar />
       
       <div className="flex justify-center my-2">
@@ -127,6 +156,7 @@ const Index = () => {
         puzzleType={currentPuzzle.type} 
         puzzleContent={currentPuzzle.content}
         puzzleImage={currentPuzzle.type === 'visual' ? currentPuzzle.image : undefined}
+        isAnimating={isTextAnimating}
       />
       
       <HintSystem 

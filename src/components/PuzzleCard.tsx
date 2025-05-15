@@ -1,16 +1,19 @@
 
 import React from 'react';
+import TypewriterText from './TypewriterText';
 
 interface PuzzleCardProps {
   puzzleType: 'text' | 'visual';
   puzzleContent: string;
   puzzleImage?: string;
+  isAnimating?: boolean;
 }
 
 const PuzzleCard: React.FC<PuzzleCardProps> = ({ 
   puzzleType, 
   puzzleContent,
-  puzzleImage
+  puzzleImage,
+  isAnimating = false
 }) => {
   return (
     <div className="w-full max-w-[80%] mx-auto bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -26,9 +29,16 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
       
       {puzzleType === 'text' && (
         <div className="text-center py-8">
-          <p className="text-base text-ecobrain-charcoal font-medium leading-relaxed">
-            {puzzleContent}
-          </p>
+          {isAnimating ? (
+            <TypewriterText 
+              text={puzzleContent}
+              className="text-base text-ecobrain-charcoal font-medium leading-relaxed"
+            />
+          ) : (
+            <p className="text-base text-ecobrain-charcoal font-medium leading-relaxed">
+              {puzzleContent}
+            </p>
+          )}
         </div>
       )}
     </div>

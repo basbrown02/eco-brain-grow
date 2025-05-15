@@ -105,6 +105,14 @@ export default {
 				'confetti': {
 					'0%': { transform: 'translateY(0) rotate(0)', opacity: '1' },
 					'100%': { transform: 'translateY(-100vh) rotate(720deg)', opacity: '0' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'fade-out': {
+					'0%': { opacity: '1', transform: 'translateY(0)' },
+					'100%': { opacity: '0', transform: 'translateY(10px)' }
 				}
 			},
 			animation: {
@@ -112,7 +120,9 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'hint-flip': 'hint-flip 0.2s ease-in',
 				'count-up': 'count-up 0.5s ease-out',
-				'confetti': 'confetti 1s ease-out forwards'
+				'confetti': 'confetti 1s ease-out forwards',
+				'fade-in': 'fade-in 0.4s ease-out',
+				'fade-out': 'fade-out 0.4s ease-out'
 			},
 			fontFamily: {
 				'inter': ['Inter', 'SF Pro Text', 'Helvetica', 'Arial', 'sans-serif'],
