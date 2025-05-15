@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import AppBar from '@/components/AppBar';
 import PuzzleCard from '@/components/PuzzleCard';
@@ -12,11 +13,10 @@ import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import puzzles from '@/data/puzzles';
 
-// Sample puzzles
 const Index = () => {
   const { toast } = useToast();
-  const [showEntry, setShowEntry] = useState(true);
-  const [showPuzzleContent, setShowPuzzleContent] = useState(false);
+  const [showEntry, setShowEntry] = useState(false); // Changed to false to show puzzles immediately
+  const [showPuzzleContent, setShowPuzzleContent] = useState(true); // Changed to true to show puzzles immediately
   const [isTextAnimating, setIsTextAnimating] = useState(false);
   const [availableHints, setAvailableHints] = useState(3);
   const [currentHint, setCurrentHint] = useState<string | undefined>(undefined);
@@ -28,8 +28,6 @@ const Index = () => {
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
-  // Get today's puzzle (or a random one)
-  // We could use the date to select a different puzzle each day
   const currentPuzzle = puzzles[puzzleIndex % puzzles.length];
   
   const handleStartPuzzle = () => {
@@ -41,6 +39,33 @@ const Index = () => {
       
       // Start typewriter animation for text puzzles
       if (currentPuzzle.type === 'text') {
+        setTimeout(() => {
+          setIsTextAnimating(true);
+        }, 500);
+      }
+    }, 400);
+  };
+  
+  // Handle changing to the previous or next puzzle
+  const handleChangePuzzle = (direction: 'prev' | 'next') => {
+    const newIndex = direction === 'next' 
+      ? (puzzleIndex + 1) % puzzles.length 
+      : (puzzleIndex - 1 + puzzles.length) % puzzles.length;
+    
+    setShowPuzzleContent(false);
+    setIsTextAnimating(false);
+    
+    setTimeout(() => {
+      setPuzzleIndex(newIndex);
+      setAvailableHints(3);
+      setCurrentHint(undefined);
+      setIsAnswerCorrect(null);
+      setIsDisabled(false);
+      
+      setShowPuzzleContent(true);
+      
+      // Start typewriter animation for text puzzles
+      if (puzzles[newIndex].type === 'text') {
         setTimeout(() => {
           setIsTextAnimating(true);
         }, 500);
@@ -141,6 +166,9 @@ const Index = () => {
           puzzleContent={currentPuzzle.content}
           puzzleImage={currentPuzzle.type === 'visual' ? currentPuzzle.image : undefined}
           isAnimating={isTextAnimating}
+          puzzleIndex={puzzleIndex}
+          totalPuzzles={puzzles.length}
+          onChangeIndex={handleChangePuzzle}
         />
         
         <HintSystem 
