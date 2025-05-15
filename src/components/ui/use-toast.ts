@@ -3,7 +3,6 @@ import * as React from "react"
 import {
   toast as sonnerToast,
   type ToastT,
-  type ToastActionElement,
   type ExternalToast,
 } from "sonner"
 
@@ -11,6 +10,8 @@ const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
+
+type ToastActionElement = React.ReactElement
 
 type ToasterToast = ToastProps & {
   id: string
