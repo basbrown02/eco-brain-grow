@@ -15,14 +15,14 @@ const AnswerRevealScreen: React.FC<AnswerRevealScreenProps> = ({
   onContinue 
 }) => {
   return (
-    <div className="min-h-[50vh] flex flex-col items-center justify-center animate-fade-in">
+    <div className="flex flex-col items-center justify-center py-6 animate-fade-in">
       <BrainIcon className="w-16 h-16 opacity-80 mb-6" />
       
       <h2 className="text-2xl font-bold text-ecobrain-charcoal mb-4">
         Puzzle Answer
       </h2>
       
-      <div className="mb-6 text-center max-w-md">
+      <div className="mb-8 text-center max-w-md px-4">
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
           <p className="text-sm text-ecobrain-charcoal/70 mb-2">The puzzle was:</p>
           <p className="text-base text-ecobrain-charcoal font-medium mb-4">{puzzleContent}</p>
@@ -38,7 +38,7 @@ const AnswerRevealScreen: React.FC<AnswerRevealScreenProps> = ({
       
       <Button 
         onClick={onContinue}
-        className="bg-ecobrain-green hover:bg-ecobrain-green/90 text-white px-6 py-3"
+        className="bg-ecobrain-green hover:bg-ecobrain-green/90 text-white px-6 py-3 mb-20"
       >
         Continue
       </Button>

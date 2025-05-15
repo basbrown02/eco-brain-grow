@@ -37,7 +37,7 @@ const AdRail: React.FC = () => {
   }, []);
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-50 border-t border-gray-200 h-[90px] px-3">
+    <div className="bg-gray-50 border-t border-gray-200 h-[90px] px-3 mt-auto">
       <div className="flex justify-center items-center h-full gap-1.5">
         {visibleAds.map(ad => (
           <div 

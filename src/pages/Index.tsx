@@ -296,7 +296,7 @@ const Index = () => {
       <TooltipProvider>
         <div className="min-h-screen flex flex-col">
           <AppBar />
-          <div className="flex-grow flex items-center justify-center">
+          <div className="flex-grow flex items-center justify-center pb-[90px]">
             <CompletionScreen 
               treesEarned={treesEarned}
               puzzleType={puzzleStage}
@@ -330,42 +330,44 @@ const Index = () => {
 
   return (
     <TooltipProvider>
-      <div className={`min-h-screen flex flex-col pb-[90px] relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`min-h-screen flex flex-col relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
         <AppBar />
         
         <div className="flex justify-center my-2">
           <BrainIcon className="opacity-80" />
         </div>
         
-        <PuzzleCard 
-          puzzleType="text"
-          puzzleContent={currentPuzzle.content}
-          isAnimating={isTextAnimating}
-          puzzleStage={puzzleStage}
-        />
-        
-        <HintSystem 
-          totalHints={3}
-          availableHints={availableHints}
-          onUseHint={handleUseHint}
-          currentHint={currentHint}
-          onShowAnswer={handleShowAnswer}
-        />
-        
-        <AnswerInput 
-          puzzleType="text"
-          onSubmit={handleSubmitAnswer}
-          isCorrect={isAnswerCorrect}
-          isDisabled={isDisabled}
-        />
-        
-        <ImpactStats 
-          treesToday={treesToday}
-          treesTotal={treesTotal}
-          activeUsers={activeUsers}
-          animateIncrease={true}
-          userIQ={userIQ}
-        />
+        <div className="flex-grow">
+          <PuzzleCard 
+            puzzleType="text"
+            puzzleContent={currentPuzzle.content}
+            isAnimating={isTextAnimating}
+            puzzleStage={puzzleStage}
+          />
+          
+          <HintSystem 
+            totalHints={3}
+            availableHints={availableHints}
+            onUseHint={handleUseHint}
+            currentHint={currentHint}
+            onShowAnswer={handleShowAnswer}
+          />
+          
+          <AnswerInput 
+            puzzleType="text"
+            onSubmit={handleSubmitAnswer}
+            isCorrect={isAnswerCorrect}
+            isDisabled={isDisabled}
+          />
+          
+          <ImpactStats 
+            treesToday={treesToday}
+            treesTotal={treesTotal}
+            activeUsers={activeUsers}
+            animateIncrease={true}
+            userIQ={userIQ}
+          />
+        </div>
         
         <AdRail />
         <Confetti active={showConfetti} />
