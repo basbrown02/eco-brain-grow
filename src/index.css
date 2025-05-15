@@ -99,6 +99,6 @@
   }
 
   body {
-    @apply bg-ecobrain-white text-ecobrain-charcoal font-inter;
+    @apply bg-white text-ecobrain-charcoal font-inter;
   }
 }

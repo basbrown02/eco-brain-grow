@@ -9,7 +9,7 @@ interface EntryScreenProps {
 
 const EntryScreen: React.FC<EntryScreenProps> = ({ onStartPuzzle }) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-ecobrain-white">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white">
       <div className="flex flex-col items-center gap-8">
         <div className="animate-fade-in">
           <BrainIcon className="w-24 h-24 opacity-80" />

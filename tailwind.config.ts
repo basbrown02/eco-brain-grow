@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -55,6 +56,7 @@ export default {
 				"ecobrain-green": "#10b981",
 				"ecobrain-charcoal": "#334155",
 				"ecobrain-hintgrey": "#f1f5f9",
+				"ecobrain-white": "#ffffff", // Adding the missing ecobrain-white color
 			},
 			borderRadius: {
 				lg: "var(--radius)",
@@ -111,6 +113,7 @@ export default {
 			},
 			fontFamily: {
 				sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+				inter: ["Inter", "sans-serif"], // Adding Inter font family
 			}
 		}
 	},
