@@ -1,19 +1,22 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface HintSystemProps {
   totalHints: number;
   onUseHint: () => void;
   availableHints: number;
   currentHint?: string;
+  onShowAnswer?: () => void;
 }
 
 const HintSystem: React.FC<HintSystemProps> = ({ 
   totalHints = 3, 
   onUseHint,
   availableHints,
-  currentHint
+  currentHint,
+  onShowAnswer
 }) => {
   const [showHint, setShowHint] = useState(false);
   const [animatingHint, setAnimatingHint] = useState<number | null>(null);
@@ -60,6 +63,16 @@ const HintSystem: React.FC<HintSystemProps> = ({
         <div className="mt-2 text-sm px-4 py-2 bg-ecobrain-green/10 rounded-md text-ecobrain-charcoal">
           {currentHint}
         </div>
+      )}
+
+      {availableHints === 0 && onShowAnswer && (
+        <Button 
+          onClick={onShowAnswer}
+          className="mt-4 bg-ecobrain-charcoal/80 hover:bg-ecobrain-charcoal text-white"
+          size="sm"
+        >
+          Show Answer
+        </Button>
       )}
     </div>
   );

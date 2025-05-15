@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AppBar from '@/components/AppBar';
 import PuzzleCard from '@/components/PuzzleCard';
@@ -9,6 +8,7 @@ import AdRail from '@/components/AdRail';
 import Confetti from '@/components/Confetti';
 import BrainIcon from '@/components/BrainIcon';
 import EntryScreen from '@/components/EntryScreen';
+import AnswerRevealScreen from '@/components/AnswerRevealScreen';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { dailyPuzzles, customPuzzles } from '@/data/puzzles';
@@ -70,6 +70,7 @@ const Index = () => {
   const [userIQ, setUserIQ] = useState(100); // Starting IQ score
   const [puzzleStage, setPuzzleStage] = useState<'daily' | 'custom' | 'complete'>('daily');
   const [showCompletionScreen, setShowCompletionScreen] = useState(false);
+  const [showAnswerScreen, setShowAnswerScreen] = useState(false);
   const [treesEarned, setTreesEarned] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
@@ -132,6 +133,43 @@ const Index = () => {
         description: "Your tree multiplier has decreased by 10%.",
         variant: "default"
       });
+    }
+  };
+
+  const handleShowAnswer = () => {
+    setShowPuzzleContent(false);
+    setShowAnswerScreen(true);
+    // Small IQ reduction for giving up
+    if (puzzleStage === 'custom') {
+      setUserIQ(prev => Math.max(80, prev - 2));
+    }
+  };
+
+  const handleContinueFromAnswer = () => {
+    // Hide answer screen
+    setShowAnswerScreen(false);
+    
+    // Determine next stage
+    if (puzzleStage === 'daily') {
+      // Move to custom puzzle
+      setPuzzleStage('custom');
+      
+      // After a brief pause, show the next puzzle
+      setTimeout(() => {
+        setAvailableHints(3);
+        setCurrentHint(undefined);
+        setIsAnswerCorrect(null);
+        setShowPuzzleContent(true);
+        
+        // Start typewriter animation
+        setTimeout(() => {
+          setIsTextAnimating(true);
+        }, 500);
+      }, 400);
+    } else {
+      // User has completed both puzzles for the day
+      setPuzzleStage('complete');
+      setShowCompletionScreen(true);
     }
   };
   
@@ -272,6 +310,24 @@ const Index = () => {
     );
   }
 
+  if (showAnswerScreen) {
+    return (
+      <TooltipProvider>
+        <div className="min-h-screen flex flex-col">
+          <AppBar />
+          <div className="flex-grow flex items-center justify-center">
+            <AnswerRevealScreen
+              answer={currentPuzzle.answer}
+              puzzleContent={currentPuzzle.content}
+              onContinue={handleContinueFromAnswer}
+            />
+          </div>
+          <AdRail />
+        </div>
+      </TooltipProvider>
+    );
+  }
+
   return (
     <TooltipProvider>
       <div className={`min-h-screen flex flex-col pb-[90px] relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
@@ -293,6 +349,7 @@ const Index = () => {
           availableHints={availableHints}
           onUseHint={handleUseHint}
           currentHint={currentHint}
+          onShowAnswer={handleShowAnswer}
         />
         
         <AnswerInput 
