@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 const ApiKeyInput = () => {
   const { toast } = useToast();
-  const DEFAULT_API_KEY = "AIzaSyAzRWtgC9AqcdKfIvmuJh5NoedFMLz5L-o";
+  const DEFAULT_API_KEY = "AIzaSyC3FtbGTh2NNr0wj-XER7CCMnsgReg_QP4";
   const [apiKey, setApiKey] = useState(getGeminiApiKey() || DEFAULT_API_KEY);
   const [isOpen, setIsOpen] = useState(false);
 
