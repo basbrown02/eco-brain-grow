@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Trophy, Tag, Tree } from 'lucide-react';
+import { Home, Trophy, Tag, Trees } from 'lucide-react';
 
 const BottomNav: React.FC = () => {
   const location = useLocation();
@@ -33,7 +33,7 @@ const BottomNav: React.FC = () => {
       </Link>
       
       <Link to="/my-forest" className="flex flex-col items-center">
-        <Tree
+        <Trees
           size={24}
           className={isActive('/my-forest') ? 'text-ecobrain-green' : 'text-gray-500'} 
         />
