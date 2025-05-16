@@ -11,6 +11,7 @@ import PuzzleContent from '@/components/PuzzleContent';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getTodaysDailyPuzzle } from '@/utils/puzzleUtils';
+import { Puzzle } from '@/data/puzzles';
 
 const Index = () => {
   const { toast } = useToast();
@@ -44,29 +45,77 @@ const Index = () => {
   const [totalTreesEarned, setTotalTreesEarned] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   
-  // Get the current puzzle based on stage
-  const currentPuzzle = getTodaysDailyPuzzle();
+  // Store current puzzle
+  const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
+  const [isLoadingPuzzle, setIsLoadingPuzzle] = useState(false);
   
-  const handleStartPuzzle = () => {
-    setShowEntry(false);
-    
-    // After entry screen fades out, show the puzzle screen
-    setTimeout(() => {
-      setShowPuzzleContent(true);
-      setPuzzleStage('daily');
+  // Load a puzzle when needed
+  const loadPuzzle = async () => {
+    setIsLoadingPuzzle(true);
+    try {
+      console.log('Index: Starting to load puzzle');
+      const puzzle = await getTodaysDailyPuzzle();
+      console.log('Index: Received puzzle from API:', puzzle);
+      setCurrentPuzzle(puzzle);
+      
+      // Reset puzzle state
       setAvailableHints(3);
       setCurrentHint(undefined);
       setIsAnswerCorrect(null);
+    } catch (error) {
+      console.error('Failed to load puzzle:', error);
+      toast({
+        title: "Error Loading Puzzle",
+        description: "Something went wrong. Using a backup puzzle instead.",
+        variant: "destructive"
+      });
+      
+      // Get a fallback hardcoded puzzle
+      const today = new Date();
+      const index = (today.getFullYear() + today.getDate() + today.getMonth()) % 3;  // Use modulo of current dailyPuzzles length
+      const fallbackPuzzle = {
+        type: 'daily' as const,
+        content: "What has a head, a tail, but no body?",
+        answer: "A coin",
+        hints: ["It jingles in your pocket", "You use it to pay for things", "It's made of metal"]
+      };
+      setCurrentPuzzle(fallbackPuzzle);
+    } finally {
+      setIsLoadingPuzzle(false);
+    }
+  };
+  
+  const handleStartPuzzle = async () => {
+    setShowEntry(false);
+    
+    try {
+      // Show loading state
+      setIsLoadingPuzzle(true);
+      setShowPuzzleContent(true); // Show container but it will display loading state
+      
+      // Load a new puzzle
+      console.log('Starting to load puzzle from handleStartPuzzle');
+      await loadPuzzle();
+      console.log('Puzzle loaded successfully');
+      
+      // After successfully loading the puzzle, configure the UI
+      setAvailableHints(3);
+      setCurrentHint(undefined);
+      setIsAnswerCorrect(null);
+      setPuzzleStage('daily');
       
       // Start typewriter animation
       setTimeout(() => {
         setIsTextAnimating(true);
       }, 500);
-    }, 400);
+    } catch (error) {
+      console.error('Error in handleStartPuzzle:', error);
+      // If there's an error, we'll still have the fallback puzzle from loadPuzzle
+    }
   };
   
   const handleUseHint = () => {
-    if (availableHints <= 0) return;
+    if (!currentPuzzle || availableHints <= 0) return;
     
     const hintIndex = 3 - availableHints;
     if (currentPuzzle.hints[hintIndex]) {
@@ -153,6 +202,8 @@ const Index = () => {
   };
   
   const handleSubmitAnswer = (answer: string) => {
+    if (!currentPuzzle) return;
+    
     const normalizedUserAnswer = answer.trim().toLowerCase();
     const normalizedCorrectAnswer = currentPuzzle.answer.toLowerCase();
     
@@ -261,7 +312,7 @@ const Index = () => {
     );
   }
 
-  if (showAnswerScreen) {
+  if (showAnswerScreen && currentPuzzle) {
     return (
       <TooltipProvider>
         <div className="min-h-screen flex flex-col overflow-y-auto">
@@ -284,7 +335,7 @@ const Index = () => {
       <div className={`min-h-screen flex flex-col overflow-y-auto relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
         <AppBar />
         
-        {showPuzzleContent && (
+        {showPuzzleContent && currentPuzzle ? (
           <PuzzleContent
             puzzleContent={currentPuzzle.content}
             isTextAnimating={isTextAnimating}
@@ -301,7 +352,11 @@ const Index = () => {
             activeUsers={activeUsers}
             userIQ={userIQ}
           />
-        )}
+        ) : showPuzzleContent && isLoadingPuzzle ? (
+          <div className="flex-grow flex items-center justify-center">
+            <p className="text-lg">Loading your daily riddle...</p>
+          </div>
+        ) : null}
         
         <AdRail />
         <Confetti active={showConfetti} />

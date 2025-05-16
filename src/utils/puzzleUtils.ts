@@ -1,11 +1,32 @@
-import { dailyPuzzles, customPuzzles } from '@/data/puzzles';
+import { dailyPuzzles, customPuzzles, createPuzzleFromGeminiData, Puzzle } from '@/data/puzzles';
+import { generateRiddle } from '@/lib/gemini';
 
 // Get today's daily puzzle
-export const getTodaysDailyPuzzle = () => {
-  // In a real app, we would use the date to select a deterministic daily puzzle
+export const getTodaysDailyPuzzle = async (): Promise<Puzzle> => {
+  console.log('getTodaysDailyPuzzle called');
+  try {
+    // Generate a random topic for the riddle
+    const topics = ['nature', 'animals', 'technology', 'science', 'food', 'space'];
+    const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+    console.log('Using random topic:', randomTopic);
+    
+    // Call the Gemini API to generate a riddle
+    console.log('Calling Gemini API...');
+    const riddleData = await generateRiddle(randomTopic);
+    console.log('Received riddle data:', riddleData);
+    
+    // Convert the riddle data to our Puzzle interface
+    const puzzle = createPuzzleFromGeminiData(riddleData);
+    console.log('Created puzzle:', puzzle);
+    return puzzle;
+  } catch (error) {
+    console.error('Error generating riddle:', error);
+    // Fallback to a hardcoded puzzle if the API fails
   const today = new Date();
   const index = (today.getFullYear() + today.getDate() + today.getMonth()) % dailyPuzzles.length;
+    console.log('Falling back to hardcoded puzzle at index:', index);
   return dailyPuzzles[index];
+  }
 };
 
 // Get a custom puzzle for user based on IQ level - keeping this function

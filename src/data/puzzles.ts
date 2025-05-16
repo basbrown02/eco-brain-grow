@@ -1,4 +1,3 @@
-
 export interface Puzzle {
   type: 'daily' | 'custom';
   content: string;
@@ -94,3 +93,13 @@ const customPuzzles: Puzzle[] = [
 ];
 
 export { dailyPuzzles, customPuzzles };
+
+// Add a function to create a puzzle from Gemini data
+export function createPuzzleFromGeminiData(geminiData: any): Puzzle {
+  return {
+    type: 'daily',
+    content: geminiData.riddle,
+    answer: geminiData.answer,
+    hints: geminiData.hints || []
+  };
+}
