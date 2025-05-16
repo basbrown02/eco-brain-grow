@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Award, 
@@ -242,9 +241,9 @@ const EcoPass: React.FC = () => {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-white font-inter overflow-hidden">
-      {/* Background overlay image */}
+      {/* Background overlay image - reduced opacity from 0.1 to 0.05 */}
       <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-10 pointer-events-none"
+        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-5 pointer-events-none"
         style={{ 
           backgroundImage: "url('/lovable-uploads/8141c7bb-6aa8-4eff-91f9-924ff6900a39.png')",
           backgroundSize: 'cover',
@@ -269,14 +268,14 @@ const EcoPass: React.FC = () => {
       </div>
 
       {/* Streak display */}
-      <div className="relative flex justify-center items-center py-4 bg-white/80 z-10">
+      <div className="relative flex justify-center items-center py-4 bg-white/70 z-10">
         <div className="bg-ecobrain-green/10 px-6 py-2 rounded-full flex items-center">
           <Trophy className="text-ecobrain-green mr-2" size={16} />
           <span className="text-ecobrain-green font-medium">Streak: 7 days</span>
         </div>
       </div>
 
-      {/* Main content with progress path */}
+      {/* Main content with progress path - background made more transparent */}
       <div className="relative flex-1 px-4 pb-24 z-10">
         <ScrollArea className="h-[calc(100vh-240px)] pr-4">
           <div className="flex flex-col items-center max-w-sm mx-auto py-6">
@@ -288,7 +287,7 @@ const EcoPass: React.FC = () => {
                     "w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 shadow-md relative",
                     node.status === 'completed' ? "bg-ecobrain-green text-white" : 
                     node.status === 'current' ? "bg-white border-4 border-ecobrain-green" : 
-                    "bg-gray-100 border border-gray-200"
+                    "bg-gray-100/80 border border-gray-200"
                   )}
                   onClick={() => handleNodeClick(node)}
                 >
@@ -319,11 +318,11 @@ const EcoPass: React.FC = () => {
                   </h3>
                 </div>
                 
-                {/* Connecting line between nodes */}
+                {/* Connecting line between nodes - made semi-transparent */}
                 {index < ecoPassData.length - 1 && (
                   <div className={cn(
                     "h-16 w-0.5 my-2",
-                    ecoPassData[index + 1].status === 'locked' ? "bg-gray-200" : "bg-ecobrain-green"
+                    ecoPassData[index + 1].status === 'locked' ? "bg-gray-200/80" : "bg-ecobrain-green/90"
                   )}></div>
                 )}
               </React.Fragment>
