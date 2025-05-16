@@ -3,17 +3,19 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppBar from '@/components/AppBar';
 import { Check } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import BrainIcon from '@/components/BrainIcon';
 
 const PricingPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
   const handleGetPlan = (plan: string) => {
     setIsTransitioning(true);
+    setSelectedPlan(plan);
     
     toast({
       title: plan === 'free' ? "Already on Free Plan" : "Premium Plan Selected",
@@ -33,115 +35,102 @@ const PricingPage: React.FC = () => {
     }
   };
 
+  const PlanBullet = ({ label }: { label: string }) => (
+    <div className="flex items-center mt-3">
+      <div className="rounded-full bg-emerald-400 p-1 mr-2 flex-shrink-0">
+        <Check className="h-4 w-4 text-white" />
+      </div>
+      <span className="text-[#1C2539] text-base">{label}</span>
+    </div>
+  );
+
   return (
-    <div className={`min-h-screen flex flex-col ${isTransitioning ? 'opacity-50 transition-opacity duration-500' : 'opacity-100 animate-fade-in'}`}>
+    <div className={`min-h-screen flex flex-col bg-white ${isTransitioning ? 'opacity-50 transition-opacity duration-500' : 'opacity-100 animate-fade-in'}`}>
       <AppBar />
       
-      <div className="flex-grow px-4 py-10 flex flex-col items-center">
-        <h1 className="text-3xl font-bold text-ecobrain-charcoal mb-3">Subscription Plans</h1>
-        <p className="text-ecobrain-charcoal/70 mb-10 text-center">
-          Choose the right plan to maximize your impact on the planet and your mind
+      <div className="flex-grow px-4 py-6 flex flex-col items-center relative">
+        {/* Optional faint leaf vein pattern */}
+        <div 
+          className="absolute inset-0 w-full h-64 bg-top bg-no-repeat opacity-5 pointer-events-none"
+          style={{ 
+            backgroundImage: "url('/lovable-uploads/8141c7bb-6aa8-4eff-91f9-924ff6900a39.png')",
+            backgroundSize: 'contain',
+            zIndex: 0 
+          }}
+        />
+        
+        {/* Brain sprout logo */}
+        <BrainIcon className="h-14 w-14 mt-4 z-10" />
+        
+        {/* Headline block */}
+        <h1 className="text-[28px] font-bold text-[#1C2539] mt-8 text-center z-10">
+          Subscription Plans
+        </h1>
+        <p className="text-base text-[#6E7D9A] text-center max-w-[280px] mt-2 z-10">
+          Choose a plan that grows your mind—and a forest.
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
-          {/* Free Plan */}
-          <Card className="border-2 border-gray-200 shadow-sm">
-            <CardHeader className="pb-4">
-              <h2 className="text-2xl font-bold">Free plan</h2>
-              <p className="text-gray-500">Free for life.</p>
-              <div className="mt-4">
-                <span className="text-5xl font-bold">$0</span>
-                <span className="text-gray-500">/month</span>
-              </div>
-            </CardHeader>
+        {/* Plan stack */}
+        <div className="max-w-md w-full space-y-6 mt-8 z-10">
+          {/* Free Card */}
+          <div className={`bg-white rounded-2xl p-6 shadow-md ${selectedPlan === 'free' ? 'ring-2 ring-emerald-500' : ''}`}>
+            <h2 className="text-[28px] font-bold text-[#1C2539]">Free plan</h2>
+            <p className="text-sm text-[#6E7D9A] mb-3">Always free.</p>
             
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <div className="rounded-full bg-ecobrain-green/10 p-1">
-                    <Check className="h-4 w-4 text-ecobrain-green" />
-                  </div>
-                  <span className="ml-2">1 tree per day donated</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="rounded-full bg-ecobrain-green/10 p-1">
-                    <Check className="h-4 w-4 text-ecobrain-green" />
-                  </div>
-                  <span className="ml-2">Ads</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="rounded-full bg-ecobrain-green/10 p-1">
-                    <Check className="h-4 w-4 text-ecobrain-green" />
-                  </div>
-                  <span className="ml-2">2 riddles</span>
-                </div>
-              </div>
-            </CardContent>
+            <div className="flex items-baseline">
+              <span className="text-5xl font-bold text-[#1C2539]">$0</span>
+              <span className="text-base text-[#6E7D9A] ml-1">/month</span>
+            </div>
             
-            <CardFooter>
-              <Button 
-                onClick={() => handleGetPlan('free')} 
-                className="w-full py-6 bg-white hover:bg-gray-50 text-ecobrain-charcoal border border-gray-300"
-              >
-                Get Free Plan
-              </Button>
-            </CardFooter>
-          </Card>
+            <div className="mt-4">
+              <PlanBullet label="1 tree planted each day" />
+              <PlanBullet label="Ads included" />
+              <PlanBullet label="2 daily riddles" />
+            </div>
+            
+            <Button 
+              onClick={() => handleGetPlan('free')} 
+              className="w-full h-12 rounded-[28px] mt-6 border border-[#20B47B] bg-white hover:bg-[#F5FAF7] text-[#20B47B] font-semibold"
+            >
+              Get Free Plan
+            </Button>
+          </div>
           
-          {/* Premium Plan */}
-          <Card className="border-2 border-ecobrain-green bg-ecobrain-green/10 shadow-sm">
-            <CardHeader className="pb-4">
-              <h2 className="text-2xl font-bold">Charity</h2>
-              <p className="text-gray-500">All essentials to maximise your wealth</p>
-              <div className="mt-4">
-                <span className="text-5xl font-bold">$10</span>
-                <span className="text-gray-500">/month</span>
-              </div>
-            </CardHeader>
+          {/* Charity Card */}
+          <div 
+            className={`bg-[#F5FAF7] rounded-2xl p-6 border-2 border-[#20B47B] 
+              ${selectedPlan === 'premium' ? 'shadow-lg transform transition-all duration-300' : ''}`}
+          >
+            <h2 className="text-[28px] font-bold text-[#1C2539]">Charity</h2>
+            <p className="text-sm text-[#6E7D9A] mb-3">
+              Boost your impact—double the trees, ad-free puzzles.
+            </p>
             
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <div className="rounded-full bg-ecobrain-green p-1">
-                    <Check className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="ml-2">2 trees donated a day</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="rounded-full bg-ecobrain-green p-1">
-                    <Check className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="ml-2">No Ads</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="rounded-full bg-ecobrain-green p-1">
-                    <Check className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="ml-2">Unlimited puzzles</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="rounded-full bg-ecobrain-green p-1">
-                    <Check className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="ml-2">Eco rewards and tier multiplier</span>
-                </div>
-              </div>
-            </CardContent>
+            <div className="flex items-baseline">
+              <span className="text-5xl font-bold text-[#1C2539]">$10</span>
+              <span className="text-base text-[#6E7D9A] ml-1">/month</span>
+            </div>
             
-            <CardFooter>
-              <Button 
-                onClick={() => handleGetPlan('premium')} 
-                className="w-full py-6 bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Get Advanced Plan
-              </Button>
-            </CardFooter>
-          </Card>
+            <div className="mt-4">
+              <PlanBullet label="2 trees planted daily" />
+              <PlanBullet label="No ads" />
+              <PlanBullet label="Unlimited puzzles" />
+              <PlanBullet label="Eco-rewards & tier multiplier" />
+            </div>
+            
+            <Button 
+              onClick={() => handleGetPlan('premium')} 
+              className="w-full h-12 rounded-[28px] mt-6 bg-[#20B47B] hover:bg-[#20B47B]/90 text-white font-semibold"
+            >
+              Start Charity Plan
+            </Button>
+          </div>
         </div>
         
         <Button 
           onClick={() => navigate(-1)}
-          className="mt-10 bg-ecobrain-charcoal/10 hover:bg-ecobrain-charcoal/20 text-ecobrain-charcoal"
+          className="mt-8 text-[#6E7D9A] bg-transparent hover:bg-gray-50"
+          aria-label="Go back"
         >
           Go Back
         </Button>
