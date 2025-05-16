@@ -109,7 +109,7 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
   return (
     <div className="flex justify-center mb-6">
       <div 
-        className="relative w-[256px] h-[256px] mt-8 transition-all duration-300 overflow-hidden"
+        className="relative w-[256px] h-[256px] mt-2 transition-all duration-300 overflow-hidden"
         style={{ 
           filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.06))',
           zIndex: 1,

@@ -48,7 +48,7 @@ const PricingPage: React.FC = () => {
       
       <div className="flex-grow px-4 py-6 flex flex-col items-center">
         {/* Single pricing header with proper spacing */}
-        <div id="pricing-header" className="flex flex-col items-center mt-10 mb-10 z-10">
+        <div id="pricing-header" className="flex flex-col items-center mt-6 mb-8 z-10">
           <BrainIcon className="h-14 w-14 mb-4" />
           <h1 className="text-[28px] font-bold text-[#1C2539] text-center">
             Subscription Plans
@@ -58,8 +58,8 @@ const PricingPage: React.FC = () => {
           </p>
         </div>
         
-        {/* Plan stack */}
-        <div className="max-w-md w-full space-y-6 z-10">
+        {/* Plan stack with 70% width */}
+        <div className="w-[70%] mx-auto space-y-6 z-10">
           {/* Free Card */}
           <div className={`bg-white rounded-2xl p-6 shadow-md ${selectedPlan === 'free' ? 'ring-2 ring-emerald-500' : ''}`}>
             <h2 className="text-[28px] font-bold text-[#1C2539]">Free plan</h2>
