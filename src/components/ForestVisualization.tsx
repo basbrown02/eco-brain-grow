@@ -32,19 +32,19 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
 
   // Tree planting positions (deterministic layout)
   const TREE_POSITIONS: TreePosition[] = [
-    {x: 24, y: 56}, {x: 72, y: 40}, {x: 120, y: 56},
-    {x: 168, y: 40}, {x: 48, y: 104}, {x: 96, y: 88},
-    {x: 144, y: 104}, {x: 192, y: 88}, {x: 72, y: 152},
-    {x: 120, y: 136}, {x: 168, y: 152}, {x: 96, y: 200},
-    {x: 144, y: 200}
+    {x: 20, y: 60}, {x: 68, y: 44}, {x: 116, y: 60},
+    {x: 164, y: 44}, {x: 44, y: 108}, {x: 92, y: 92},
+    {x: 140, y: 108}, {x: 188, y: 92}, {x: 68, y: 156},
+    {x: 116, y: 140}, {x: 164, y: 156}, {x: 92, y: 204},
+    {x: 140, y: 204}
   ];
 
   // Base island image based on season
   const getBaseIslandImage = () => {
     if (isWinter) {
-      return "/lovable-uploads/9f2c9542-20e9-4485-a751-e4209efc8e5f.png"; // Snow covered island
+      return "/lovable-uploads/a55f8157-2b90-49d0-9da6-bc08fa0a8f54.png"; // Snow covered island
     } else {
-      return "/lovable-uploads/af5399a3-5f0b-4883-9ee2-6e81bc8633c4.png"; // Green island base
+      return "/lovable-uploads/a55f8157-2b90-49d0-9da6-bc08fa0a8f54.png"; // Using same green island base for now
     }
   };
 
@@ -59,11 +59,12 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
             top: '104px',
             left: '104px',
             width: '48px',
-            height: '48px'
+            height: '48px',
+            zIndex: 2
           }}
         >
           <img 
-            src="/lovable-uploads/9bf5ca4a-bfc4-46dd-8238-0ab3f8c6f76f.png" 
+            src="/lovable-uploads/99e8996e-3919-4ba8-960d-662701345c7b.png" 
             alt="Sad sign" 
             className="w-full h-full object-contain"
           />
@@ -85,7 +86,8 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
             left: `${pos.x}px`,
             width: '48px',
             height: '72px',
-            animation: animated ? `grow 300ms ${idx * 50}ms forwards` : 'none'
+            zIndex: 2,
+            animation: animated ? `grow 300ms ${idx * 80}ms forwards` : 'none'
           }}
         >
           <img 
@@ -101,7 +103,7 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
   return (
     <div className="flex justify-center mb-6">
       <div 
-        className={`relative w-64 h-64 transition-all duration-300 ${
+        className={`relative w-[256px] h-[256px] mt-6 transition-all duration-300 ${
           animated ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-90'
         }`}
         style={{ 
@@ -113,17 +115,17 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
         <img 
           src={getBaseIslandImage()} 
           alt="Forest island base"
-          className="w-full h-full object-contain"
+          className="absolute top-0 left-0 w-full h-full object-contain z-[1]"
         />
         
         {/* Tree layer */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none z-[2]">
           {renderTreesOrSign()}
         </div>
         
         {/* Snow effect for winter */}
         {isWinter && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-[3]">
             {[...Array(20)].map((_, i) => (
               <div 
                 key={i}
