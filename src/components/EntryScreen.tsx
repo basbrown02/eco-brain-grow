@@ -12,21 +12,13 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onStartPuzzle }) => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
       <div className="flex flex-col items-center gap-8">
         <div className="animate-fade-in">
-          <BrainIcon className="w-24 h-24" />
+          <BrainIcon className="w-32 h-32" />
         </div>
-        
-        <h1 className="text-3xl font-bold text-ecobrain-charcoal animate-fade-in opacity-0" style={{ animationDelay: "300ms", animationFillMode: "forwards" }}>
-          EcoBrain
-        </h1>
-        
-        <p className="text-lg text-center text-ecobrain-charcoal/80 max-w-xs animate-fade-in opacity-0" style={{ animationDelay: "600ms", animationFillMode: "forwards" }}>
-          Brainpower that plants trees.
-        </p>
         
         <Button 
           onClick={onStartPuzzle}
           className="bg-ecobrain-green hover:bg-ecobrain-green/90 text-white px-8 py-6 rounded-full text-lg animate-fade-in opacity-0 hover:scale-105 transition-all"
-          style={{ animationDelay: "900ms", animationFillMode: "forwards" }}
+          style={{ animationDelay: "600ms", animationFillMode: "forwards" }}
         >
           See today's puzzle
         </Button>
