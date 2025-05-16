@@ -59,19 +59,19 @@ const PricingPage: React.FC = () => {
           }}
         />
         
-        {/* Brain sprout logo */}
-        <BrainIcon className="h-14 w-14 mt-4 z-10" />
-        
-        {/* Headline block */}
-        <h1 className="text-[28px] font-bold text-[#1C2539] mt-8 text-center z-10">
-          Subscription Plans
-        </h1>
-        <p className="text-base text-[#6E7D9A] text-center max-w-[280px] mt-2 z-10">
-          Choose a plan that grows your mind—and a forest.
-        </p>
+        {/* Pricing header section - revised structure */}
+        <div id="pricing-header" className="flex flex-col items-center mt-4 mb-8 z-10">
+          <BrainIcon className="h-14 w-14 mb-2" />
+          <h1 className="text-[28px] font-bold text-[#1C2539] text-center">
+            Subscription Plans
+          </h1>
+          <p className="text-base text-[#6E7D9A] text-center max-w-[280px] mt-2">
+            Choose a plan that grows your mind—and a forest.
+          </p>
+        </div>
         
         {/* Plan stack */}
-        <div className="max-w-md w-full space-y-6 mt-8 z-10">
+        <div className="max-w-md w-full space-y-6 z-10">
           {/* Free Card */}
           <div className={`bg-white rounded-2xl p-6 shadow-md ${selectedPlan === 'free' ? 'ring-2 ring-emerald-500' : ''}`}>
             <h2 className="text-[28px] font-bold text-[#1C2539]">Free plan</h2>
