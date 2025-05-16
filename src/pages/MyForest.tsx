@@ -16,15 +16,33 @@ const MyForest: React.FC = () => {
   // Check if current month is December or January for winter theme
   const isWinter = currentDate.getMonth() === 11 || currentDate.getMonth() === 0;
   
-  // Mock data
-  const stats = {
+  // Stats based on the mockup data (these would come from your state/API in a real app)
+  const [stats, setStats] = useState({
     streak: 42,
-    treesPlanted: 321,
-    topPercentage: 2,
+    treesPlantedTotal: 321,
+    treesPlantedPeriod: 13, // Changes based on period
+    percentileText: "Top 2%",
     co2Impact: 50000,
     iqIncrease: 12,
-    nextTierReward: '50% off GYG burrito'
-  };
+    nextTierReward: '50% off GYG burrito',
+    lastPuzzleCorrect: false
+  });
+  
+  // When period changes, adjust trees for that period
+  useEffect(() => {
+    // Mock logic - in reality would come from API/state
+    const treesForPeriod = {
+      day: 1,
+      week: 5,
+      month: 13,
+      year: stats.treesPlantedTotal
+    };
+    
+    setStats(prev => ({
+      ...prev,
+      treesPlantedPeriod: treesForPeriod[activePeriod]
+    }));
+  }, [activePeriod]);
   
   const handlePeriodChange = (period: Period) => {
     setActivePeriod(period);
@@ -63,10 +81,20 @@ const MyForest: React.FC = () => {
     }
   };
   
+  // Effect to handle puzzle success scenario
   useEffect(() => {
-    // This would integrate with the app's analytics in a real app
-    console.log(`Viewing forest data for ${activePeriod} period on ${currentDate.toDateString()}`);
-  }, [activePeriod, currentDate]);
+    if (stats.lastPuzzleCorrect) {
+      // Update stats after correct puzzle
+      setStats(prev => ({
+        ...prev,
+        treesPlantedTotal: prev.treesPlantedTotal + 1,
+        treesPlantedPeriod: prev.treesPlantedPeriod + 1,
+        co2Impact: prev.co2Impact + 4,
+        iqIncrease: prev.iqIncrease + 2,
+        lastPuzzleCorrect: false
+      }));
+    }
+  }, [stats.lastPuzzleCorrect]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-16">
@@ -98,12 +126,19 @@ const MyForest: React.FC = () => {
       {/* Forest Visualization */}
       <ForestVisualization 
         period={activePeriod}
-        treeCount={stats.treesPlanted}
+        treeCount={stats.treesPlantedPeriod}
         isWinter={isWinter}
       />
       
       {/* Stats Card */}
-      <StatsCard {...stats} />
+      <StatsCard 
+        streak={stats.streak}
+        treesPlanted={stats.treesPlantedTotal}
+        topPercentage={parseInt(stats.percentileText.split(' ')[1])}
+        co2Impact={stats.co2Impact}
+        iqIncrease={stats.iqIncrease}
+        nextTierReward={stats.nextTierReward}
+      />
     </div>
   );
 };
