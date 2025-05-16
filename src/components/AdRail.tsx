@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Charity ad data
@@ -27,7 +27,7 @@ const AdRail: React.FC = () => {
             <a 
               key={ad.id}
               href={ad.link}
-              className="block w-full rounded-lg overflow-hidden shadow-md mb-4"
+              className="block w-full max-w-[70%] mx-auto rounded-lg overflow-hidden shadow-md mb-4"
             >
               <img 
                 src={ad.image} 
