@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppBar from '@/components/AppBar';
@@ -46,7 +45,7 @@ const PricingPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col bg-white ${isTransitioning ? 'opacity-50 transition-opacity duration-500' : 'opacity-100 animate-fade-in'}`}>
-      <AppBar />
+      {/* We're removing AppBar which contains a logo */}
       
       <div className="flex-grow px-4 py-6 flex flex-col items-center relative">
         {/* Optional faint leaf vein pattern */}
