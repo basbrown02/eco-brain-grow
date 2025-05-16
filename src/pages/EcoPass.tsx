@@ -241,9 +241,9 @@ const EcoPass: React.FC = () => {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-white font-inter overflow-hidden">
-      {/* Background overlay image - reduced opacity from 0.1 to 0.05 */}
+      {/* Background overlay image - reduced opacity from 0.05 to 0.02 */}
       <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-5 pointer-events-none"
+        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-10 pointer-events-none"
         style={{ 
           backgroundImage: "url('/lovable-uploads/8141c7bb-6aa8-4eff-91f9-924ff6900a39.png')",
           backgroundSize: 'cover',
@@ -251,8 +251,8 @@ const EcoPass: React.FC = () => {
         }}
       />
 
-      {/* Hero section with gradient */}
-      <div className="relative bg-gradient-to-r from-ecobrain-green to-green-400 p-6 pt-20 pb-8 text-white z-10">
+      {/* Hero section with gradient - reduced opacity */}
+      <div className="relative bg-gradient-to-r from-ecobrain-green/90 to-green-400/90 p-6 pt-20 pb-8 text-white z-10">
         <div className="flex justify-between items-center">
           <div>
             <div className="flex items-center">
@@ -267,8 +267,8 @@ const EcoPass: React.FC = () => {
         </div>
       </div>
 
-      {/* Streak display */}
-      <div className="relative flex justify-center items-center py-4 bg-white/70 z-10">
+      {/* Streak display - reduced background opacity */}
+      <div className="relative flex justify-center items-center py-4 bg-white/50 z-10">
         <div className="bg-ecobrain-green/10 px-6 py-2 rounded-full flex items-center">
           <Trophy className="text-ecobrain-green mr-2" size={16} />
           <span className="text-ecobrain-green font-medium">Streak: 7 days</span>
@@ -286,8 +286,8 @@ const EcoPass: React.FC = () => {
                   className={cn(
                     "w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 shadow-md relative",
                     node.status === 'completed' ? "bg-ecobrain-green text-white" : 
-                    node.status === 'current' ? "bg-white border-4 border-ecobrain-green" : 
-                    "bg-gray-100/80 border border-gray-200"
+                    node.status === 'current' ? "bg-white/80 border-4 border-ecobrain-green" : 
+                    "bg-gray-100/60 border border-gray-200"
                   )}
                   onClick={() => handleNodeClick(node)}
                 >
@@ -300,7 +300,7 @@ const EcoPass: React.FC = () => {
                   
                   {/* Progress ring for current node */}
                   {node.status === 'current' && node.progress > 0 && (
-                    <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-sm">
+                    <div className="absolute -bottom-2 -right-2 bg-white/90 rounded-full p-1 shadow-sm">
                       <div className="w-5 h-5 rounded-full bg-ecobrain-green/20 flex items-center justify-center text-[10px] font-bold text-ecobrain-green">
                         {node.progress}%
                       </div>
@@ -318,11 +318,11 @@ const EcoPass: React.FC = () => {
                   </h3>
                 </div>
                 
-                {/* Connecting line between nodes - made semi-transparent */}
+                {/* Connecting line between nodes - made more transparent */}
                 {index < ecoPassData.length - 1 && (
                   <div className={cn(
                     "h-16 w-0.5 my-2",
-                    ecoPassData[index + 1].status === 'locked' ? "bg-gray-200/80" : "bg-ecobrain-green/90"
+                    ecoPassData[index + 1].status === 'locked' ? "bg-gray-200/60" : "bg-ecobrain-green/70"
                   )}></div>
                 )}
               </React.Fragment>
@@ -333,7 +333,7 @@ const EcoPass: React.FC = () => {
       
       {/* Bottom sheet for reward details */}
       <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="bottom" className="rounded-t-xl">
+        <SheetContent side="bottom" className="rounded-t-xl bg-white/95">
           {selectedNode && (
             <div className="flex flex-col items-center pt-6">
               <div className={cn(
