@@ -4,7 +4,6 @@ import PuzzleCard from '@/components/PuzzleCard';
 import HintSystem from '@/components/HintSystem';
 import AnswerInput from '@/components/AnswerInput';
 import ImpactStats from '@/components/ImpactStats';
-import BrainIcon from '@/components/BrainIcon';
 
 interface PuzzleContentProps {
   puzzleContent: string;
@@ -41,11 +40,7 @@ const PuzzleContent: React.FC<PuzzleContentProps> = ({
 }) => {
   return (
     <>
-      <div className="flex justify-center my-2">
-        <BrainIcon className="w-16 h-16" />
-      </div>
-      
-      <div className="flex-grow">
+      <div className="flex-grow pt-4">
         <PuzzleCard 
           puzzleType="text"
           puzzleContent={puzzleContent}
