@@ -59,13 +59,13 @@ const PricingPage: React.FC = () => {
           }}
         />
         
-        {/* Pricing header section - revised structure */}
-        <div id="pricing-header" className="flex flex-col items-center mt-4 mb-8 z-10">
-          <BrainIcon className="h-14 w-14 mb-2" />
+        {/* Single pricing header with proper spacing */}
+        <div id="pricing-header" className="flex flex-col items-center mt-6 mb-10 z-10">
+          <BrainIcon className="h-14 w-14 mb-4" />
           <h1 className="text-[28px] font-bold text-[#1C2539] text-center">
             Subscription Plans
           </h1>
-          <p className="text-base text-[#6E7D9A] text-center max-w-[280px] mt-2">
+          <p className="text-base text-[#6E7D9A] text-center max-w-[280px] mt-3">
             Choose a plan that grows your mind—and a forest.
           </p>
         </div>
