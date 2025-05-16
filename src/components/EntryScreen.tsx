@@ -12,7 +12,7 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onStartPuzzle }) => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
       <div className="flex flex-col items-center gap-8">
         <div className="animate-fade-in">
-          <BrainIcon className="w-24 h-24 opacity-80" />
+          <BrainIcon className="w-24 h-24" />
         </div>
         
         <h1 className="text-3xl font-bold text-ecobrain-charcoal animate-fade-in opacity-0" style={{ animationDelay: "300ms", animationFillMode: "forwards" }}>
@@ -20,7 +20,7 @@ const EntryScreen: React.FC<EntryScreenProps> = ({ onStartPuzzle }) => {
         </h1>
         
         <p className="text-lg text-center text-ecobrain-charcoal/80 max-w-xs animate-fade-in opacity-0" style={{ animationDelay: "600ms", animationFillMode: "forwards" }}>
-          Solve puzzles, solve the planet.
+          Brainpower that plants trees.
         </p>
         
         <Button 

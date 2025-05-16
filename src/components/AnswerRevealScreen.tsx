@@ -16,10 +16,10 @@ const AnswerRevealScreen: React.FC<AnswerRevealScreenProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center py-6 animate-fade-in">
-      <BrainIcon className="w-16 h-16 opacity-80 mb-6" />
+      <BrainIcon className="w-16 h-16 mb-6" />
       
       <h2 className="text-2xl font-bold text-ecobrain-charcoal mb-4">
-        Puzzle Answer
+        Thanks for trying!
       </h2>
       
       <div className="mb-8 text-center max-w-md px-4">

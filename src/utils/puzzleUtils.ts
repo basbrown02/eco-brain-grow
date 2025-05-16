@@ -1,4 +1,3 @@
-
 import { dailyPuzzles, customPuzzles } from '@/data/puzzles';
 
 // Get today's daily puzzle
@@ -9,7 +8,8 @@ export const getTodaysDailyPuzzle = () => {
   return dailyPuzzles[index];
 };
 
-// Get a custom puzzle for user based on IQ level
+// Get a custom puzzle for user based on IQ level - keeping this function
+// but we won't be using it anymore
 export const getCustomPuzzleForUser = (userIQ: number) => {
   // Determine difficulty level based on user's IQ
   let difficultyLevel = 1; // Default easy

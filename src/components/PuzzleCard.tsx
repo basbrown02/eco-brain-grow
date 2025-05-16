@@ -6,7 +6,7 @@ interface PuzzleCardProps {
   puzzleType: 'text';
   puzzleContent: string;
   isAnimating?: boolean;
-  puzzleStage: 'daily' | 'custom' | 'complete';
+  puzzleStage: 'daily' | 'complete';
 }
 
 const PuzzleCard: React.FC<PuzzleCardProps> = ({ 
@@ -15,11 +15,9 @@ const PuzzleCard: React.FC<PuzzleCardProps> = ({
   isAnimating = false,
   puzzleStage
 }) => {
-  // Determine the badge text based on stage
+  // Now we only have "Daily Puzzle"
   const getBadgeText = () => {
-    if (puzzleStage === 'daily') return "Daily Puzzle";
-    if (puzzleStage === 'custom') return "Custom Puzzle";
-    return "";
+    return "Daily Puzzle";
   };
 
   return (

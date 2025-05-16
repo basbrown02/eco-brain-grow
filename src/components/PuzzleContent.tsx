@@ -9,7 +9,7 @@ import BrainIcon from '@/components/BrainIcon';
 interface PuzzleContentProps {
   puzzleContent: string;
   isTextAnimating: boolean;
-  puzzleStage: 'daily' | 'custom' | 'complete';
+  puzzleStage: 'daily' | 'complete';
   availableHints: number;
   currentHint?: string;
   handleUseHint: () => void;
@@ -42,7 +42,7 @@ const PuzzleContent: React.FC<PuzzleContentProps> = ({
   return (
     <>
       <div className="flex justify-center my-2">
-        <BrainIcon className="opacity-80" />
+        <BrainIcon className="w-16 h-16" />
       </div>
       
       <div className="flex-grow">

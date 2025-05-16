@@ -7,12 +7,11 @@ import EntryScreen from '@/components/EntryScreen';
 import AnswerRevealScreen from '@/components/AnswerRevealScreen';
 import TreePlantingAnimation from '@/components/TreePlantingAnimation';
 import CongratulationsScreen from '@/components/CongratulationsScreen';
-import SeedPlantedScreen from '@/components/SeedPlantedScreen';
 import CompletionScreen from '@/components/CompletionScreen';
 import PuzzleContent from '@/components/PuzzleContent';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { getTodaysDailyPuzzle, getCustomPuzzleForUser } from '@/utils/puzzleUtils';
+import { getTodaysDailyPuzzle } from '@/utils/puzzleUtils';
 
 const Index = () => {
   const { toast } = useToast();
@@ -30,7 +29,6 @@ const Index = () => {
   // Tree planting animation states
   const [plantingStage, setPlantingStage] = useState<'seed' | 'watering' | 'growing' | null>(null);
   const [showCongratulations, setShowCongratulations] = useState(false);
-  const [showSeedPlanted, setShowSeedPlanted] = useState(false);
   
   // User stats 
   const [userIQ, setUserIQ] = useState(100); // Starting IQ score
@@ -40,7 +38,7 @@ const Index = () => {
   const [iqIncrease, setIqIncrease] = useState(3); // points
   
   // Track user puzzle progress
-  const [puzzleStage, setPuzzleStage] = useState<'daily' | 'custom' | 'complete'>('daily');
+  const [puzzleStage, setPuzzleStage] = useState<'daily' | 'complete'>('daily');
   const [showCompletionScreen, setShowCompletionScreen] = useState(false);
   const [showAnswerScreen, setShowAnswerScreen] = useState(false);
   const [treesEarned, setTreesEarned] = useState(0);
@@ -48,9 +46,7 @@ const Index = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   
   // Get the current puzzle based on stage
-  const currentPuzzle = puzzleStage === 'daily' 
-    ? getTodaysDailyPuzzle() 
-    : getCustomPuzzleForUser(userIQ);
+  const currentPuzzle = getTodaysDailyPuzzle();
   
   const handleStartPuzzle = () => {
     setShowEntry(false);
@@ -90,57 +86,34 @@ const Index = () => {
   const handleShowAnswer = () => {
     setShowPuzzleContent(false);
     setShowAnswerScreen(true);
-    // Small IQ reduction for giving up
-    if (puzzleStage === 'custom') {
-      setUserIQ(prev => Math.max(80, prev - 2));
-    }
   };
 
   const handleContinueFromAnswer = () => {
     // Hide answer screen
     setShowAnswerScreen(false);
     
-    // Determine next stage
-    if (puzzleStage === 'daily') {
-      // Move to custom puzzle
-      setPuzzleStage('custom');
-      
-      // After a brief pause, show the next puzzle
-      setTimeout(() => {
-        setAvailableHints(3);
-        setCurrentHint(undefined);
-        setIsAnswerCorrect(null);
-        setShowPuzzleContent(true);
-        
-        // Start typewriter animation
-        setTimeout(() => {
-          setIsTextAnimating(true);
-        }, 500);
-      }, 400);
-    } else {
-      // User has completed both puzzles for the day
-      setPuzzleStage('complete');
-      setShowCongratulations(true);
-    }
+    // Show thank you screen
+    toast({
+      title: "Thanks for trying!",
+      description: "Come back tomorrow for another chance to plant a tree.",
+      variant: "default"
+    });
+    
+    // Return to entry screen
+    setShowEntry(true);
   };
 
   const handlePlantingAnimationComplete = () => {
     setPlantingStage(null);
     
-    // After animation completes, show the appropriate screen
+    // After animation completes, show the congratulations screen
     setTimeout(() => {
-      if (puzzleStage === 'daily') {
-        // Show seed planted screen after first puzzle
-        setShowSeedPlanted(true);
-      } else if (puzzleStage === 'custom') {
-        // Show congratulations after second puzzle with full tree
-        setShowCongratulations(true);
-        
-        // Update user stats
-        setUserTreesTotal(prev => prev + 1);
-        setCo2Reduced(prev => prev + 7); // Each tree reduces ~7kg of CO2 annually
-        setStreakDays(prev => prev + 1);
-      }
+      setShowCongratulations(true);
+      
+      // Update user stats
+      setUserTreesTotal(prev => prev + 1);
+      setCo2Reduced(prev => prev + 7); // Each tree reduces ~7kg of CO2 annually
+      setStreakDays(prev => prev + 1);
     }, 500);
   };
   
@@ -164,37 +137,12 @@ const Index = () => {
     // Store trees earned for this puzzle
     setTreesEarned(treeIncrement);
     
-    // Start tree planting animation based on puzzle stage
-    if (puzzleStage === 'daily') {
-      setPlantingStage('seed');
-    } else {
-      setPlantingStage('growing');
-    }
+    // Start tree planting animation - go straight to growing
+    setPlantingStage('growing');
     
     // Update total trees
     setTreesToday(prev => prev + treeIncrement);
     setTreesTotal(prev => prev + treeIncrement);
-  };
-  
-  const handleContinueFromSeedPlanted = () => {
-    // Hide seed planted screen
-    setShowSeedPlanted(false);
-    
-    // Move to custom puzzle
-    setPuzzleStage('custom');
-    
-    // After a brief pause, show the next puzzle
-    setTimeout(() => {
-      setAvailableHints(3);
-      setCurrentHint(undefined);
-      setIsAnswerCorrect(null);
-      setShowPuzzleContent(true);
-      
-      // Start typewriter animation
-      setTimeout(() => {
-        setIsTextAnimating(true);
-      }, 500);
-    }, 400);
   };
 
   const handleContinueFromCongratulations = () => {
@@ -216,24 +164,16 @@ const Index = () => {
     if (correct) {
       // Calculate trees earned based on:
       // 1. Base amount (5 trees)
-      // 2. If it's a custom puzzle, bonus based on difficulty level
-      // 3. Remaining hints (each unused hint = +1 tree)
+      // 2. Remaining hints (each unused hint = +1 tree)
       let treeIncrement = 5; // Base amount
-      
-      // Add bonus for custom puzzle difficulty
-      if (puzzleStage === 'custom' && currentPuzzle.difficultyLevel) {
-        treeIncrement += currentPuzzle.difficultyLevel * 2;
-      }
       
       // Add bonus for unused hints
       treeIncrement += availableHints;
       
       // Adjust IQ based on performance (faster answer, fewer hints = higher IQ boost)
-      if (puzzleStage === 'custom') {
-        const iqBoost = Math.floor((availableHints + 1) * 2); // +2 to +6 IQ points
-        setUserIQ(prev => prev + iqBoost);
-        setIqIncrease(iqBoost);
-      }
+      const iqBoost = Math.floor((availableHints + 1) * 2); // +2 to +6 IQ points
+      setUserIQ(prev => prev + iqBoost);
+      setIqIncrease(iqBoost);
       
       // Show success feedback
       setTimeout(() => {
@@ -251,7 +191,7 @@ const Index = () => {
           setIsAnswerCorrect(null);
           setShowConfetti(false);
           
-          // Transition to seed planted or tree growth animation
+          // Transition to tree growth animation
           transitionToNextStage(treeIncrement);
         }, 3000);
       }, 500);
@@ -268,10 +208,8 @@ const Index = () => {
         variant: "destructive"
       });
       
-      // Small IQ reduction for wrong answers on custom puzzles
-      if (puzzleStage === 'custom') {
-        setUserIQ(prev => Math.max(80, prev - 1)); // Prevent IQ from going below 80
-      }
+      // Small IQ reduction for wrong answers
+      setUserIQ(prev => Math.max(80, prev - 1)); // Prevent IQ from going below 80
     }
   };
 
@@ -305,20 +243,6 @@ const Index = () => {
     );
   }
   
-  if (showSeedPlanted) {
-    return (
-      <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
-          <AppBar />
-          <div className="flex-grow flex items-center justify-center pb-20">
-            <SeedPlantedScreen onContinue={handleContinueFromSeedPlanted} />
-          </div>
-          <AdRail />
-        </div>
-      </TooltipProvider>
-    );
-  }
-  
   if (showCompletionScreen) {
     return (
       <TooltipProvider>
@@ -328,8 +252,8 @@ const Index = () => {
             <CompletionScreen 
               treesEarned={treesEarned}
               puzzleType={puzzleStage}
-              onContinue={handleContinueFromSeedPlanted}
-              isComplete={puzzleStage === 'custom'}
+              onContinue={handleContinueFromCongratulations}
+              isComplete={true}
             />
           </div>
           <AdRail />
