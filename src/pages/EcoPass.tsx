@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Award, 
@@ -241,9 +242,9 @@ const EcoPass: React.FC = () => {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-white font-inter overflow-hidden">
-      {/* Background overlay image - reduced opacity from 0.05 to 0.02 */}
+      {/* Background overlay image - further reduced opacity */}
       <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-10 pointer-events-none"
+        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-20 pointer-events-none"
         style={{ 
           backgroundImage: "url('/lovable-uploads/8141c7bb-6aa8-4eff-91f9-924ff6900a39.png')",
           backgroundSize: 'cover',
@@ -251,8 +252,8 @@ const EcoPass: React.FC = () => {
         }}
       />
 
-      {/* Hero section with gradient - reduced opacity */}
-      <div className="relative bg-gradient-to-r from-ecobrain-green/90 to-green-400/90 p-6 pt-20 pb-8 text-white z-10">
+      {/* Hero section with gradient - further reduced opacity */}
+      <div className="relative bg-gradient-to-r from-ecobrain-green/70 to-green-400/70 p-6 pt-20 pb-8 text-white z-10">
         <div className="flex justify-between items-center">
           <div>
             <div className="flex items-center">
@@ -267,27 +268,27 @@ const EcoPass: React.FC = () => {
         </div>
       </div>
 
-      {/* Streak display - reduced background opacity */}
-      <div className="relative flex justify-center items-center py-4 bg-white/50 z-10">
+      {/* Streak display - further reduced background opacity */}
+      <div className="relative flex justify-center items-center py-4 bg-white/30 z-10">
         <div className="bg-ecobrain-green/10 px-6 py-2 rounded-full flex items-center">
           <Trophy className="text-ecobrain-green mr-2" size={16} />
           <span className="text-ecobrain-green font-medium">Streak: 7 days</span>
         </div>
       </div>
 
-      {/* Main content with progress path - background made more transparent */}
+      {/* Main content with progress path - further reduced background opacity */}
       <div className="relative flex-1 px-4 pb-24 z-10">
         <ScrollArea className="h-[calc(100vh-240px)] pr-4">
           <div className="flex flex-col items-center max-w-sm mx-auto py-6">
             {ecoPassData.map((node, index) => (
               <React.Fragment key={node.id}>
-                {/* Node */}
+                {/* Node - with further reduced opacity */}
                 <div 
                   className={cn(
                     "w-20 h-20 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 shadow-md relative",
-                    node.status === 'completed' ? "bg-ecobrain-green text-white" : 
-                    node.status === 'current' ? "bg-white/80 border-4 border-ecobrain-green" : 
-                    "bg-gray-100/60 border border-gray-200"
+                    node.status === 'completed' ? "bg-ecobrain-green/85 text-white" : 
+                    node.status === 'current' ? "bg-white/60 border-4 border-ecobrain-green" : 
+                    "bg-gray-100/45 border border-gray-200"
                   )}
                   onClick={() => handleNodeClick(node)}
                 >
@@ -298,9 +299,9 @@ const EcoPass: React.FC = () => {
                     "text-gray-400"
                   ))}
                   
-                  {/* Progress ring for current node */}
+                  {/* Progress ring for current node - further reduced opacity */}
                   {node.status === 'current' && node.progress > 0 && (
-                    <div className="absolute -bottom-2 -right-2 bg-white/90 rounded-full p-1 shadow-sm">
+                    <div className="absolute -bottom-2 -right-2 bg-white/70 rounded-full p-1 shadow-sm">
                       <div className="w-5 h-5 rounded-full bg-ecobrain-green/20 flex items-center justify-center text-[10px] font-bold text-ecobrain-green">
                         {node.progress}%
                       </div>
@@ -318,11 +319,11 @@ const EcoPass: React.FC = () => {
                   </h3>
                 </div>
                 
-                {/* Connecting line between nodes - made more transparent */}
+                {/* Connecting line between nodes - further reduced opacity */}
                 {index < ecoPassData.length - 1 && (
                   <div className={cn(
                     "h-16 w-0.5 my-2",
-                    ecoPassData[index + 1].status === 'locked' ? "bg-gray-200/60" : "bg-ecobrain-green/70"
+                    ecoPassData[index + 1].status === 'locked' ? "bg-gray-200/45" : "bg-ecobrain-green/50"
                   )}></div>
                 )}
               </React.Fragment>
@@ -331,16 +332,16 @@ const EcoPass: React.FC = () => {
         </ScrollArea>
       </div>
       
-      {/* Bottom sheet for reward details */}
+      {/* Bottom sheet for reward details - further reduced opacity */}
       <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="bottom" className="rounded-t-xl bg-white/95">
+        <SheetContent side="bottom" className="rounded-t-xl bg-white/80">
           {selectedNode && (
             <div className="flex flex-col items-center pt-6">
               <div className={cn(
                 "w-24 h-24 rounded-full flex items-center justify-center mb-6",
-                selectedNode.status === 'completed' ? "bg-ecobrain-green text-white" : 
+                selectedNode.status === 'completed' ? "bg-ecobrain-green/85 text-white" : 
                 selectedNode.status === 'current' ? "bg-ecobrain-green/10" : 
-                "bg-gray-100"
+                "bg-gray-100/70"
               )}>
                 {getNodeIcon(selectedNode.icon, cn(
                   "w-10 h-10",
