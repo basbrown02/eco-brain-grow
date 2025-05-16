@@ -5,13 +5,14 @@ import {
   type ToastT,
   type ExternalToast,
 } from "sonner"
+import { Toast } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
-type ToastActionElement = React.ReactElement
+export type ToastActionElement = React.ReactElement
 
 type ToasterToast = ToastProps & {
   id: string
