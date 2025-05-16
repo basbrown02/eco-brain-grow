@@ -30,22 +30,20 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
     return () => clearTimeout(timer);
   }, [period, treeCount, isWinter]);
 
-  // Anchor point grid - these mark where each trunk touches the surface
-  // Y-values measured to ensure trees never float
-  const ANCHORS: TreePosition[] = [
-    // Row 1 (back edge)
-    {x: 38, y: 96}, {x: 92, y: 82}, {x: 146, y: 96}, {x: 200, y: 82},
-    // Row 2
-    {x: 64, y: 126}, {x: 118, y: 112}, {x: 172, y: 126},
-    // Row 3
-    {x: 38, y: 156}, {x: 92, y: 142}, {x: 146, y: 156}, {x: 200, y: 142},
-    // Row 4 (front edge)
-    {x: 64, y: 186}, {x: 118, y: 172}, {x: 172, y: 186}
-  ]; // 15 safe cells
+  // Center-tight grid (3×3) - these mark where each trunk touches the surface
+  const INNER_ANCHORS: TreePosition[] = [
+    // Row 1 (back row)
+    {x:100, y:112}, {x:130, y:112}, {x:160, y:112},
+    // Row 2 (middle row)
+    {x:100, y:142}, {x:130, y:142}, {x:160, y:142},
+    // Row 3 (front row)
+    {x:100, y:172}, {x:130, y:172}, {x:160, y:172}
+  ]; // 9 safe cells
 
   // Offsets for properly positioning tree sprites
   const HALF_W = 24; // Half sprite width (48/2)
   const FULL_H = 72; // Full sprite height
+  const MAX_TREES = 9; // Hard cap
 
   // Base island image based on season
   const getBaseIslandImage = () => {
@@ -79,14 +77,11 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
         </div>
       );
     } else {
-      // Calculate how many trees to show (limit to available positions)
-      const treesToShow = Math.min(treeCount, ANCHORS.length);
+      // Calculate how many trees to show (limit to MAX_TREES)
+      const treesToShow = Math.min(treeCount, MAX_TREES);
       
       // Get positions for trees to show - deterministic order
-      const positions = ANCHORS.slice(0, treesToShow);
-      
-      // Optional: Shuffle for variety
-      // const positions = [...ANCHORS].sort(() => 0.5 - Math.random()).slice(0, treesToShow);
+      const positions = INNER_ANCHORS.slice(0, treesToShow);
       
       return positions.map((pos, idx) => (
         <div 
@@ -98,7 +93,7 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
             width: '48px',
             height: '72px',
             zIndex: 2,
-            animation: animated ? `grow 320ms ${idx * 80}ms ease-out forwards` : 'none'
+            animation: animated ? `grow 300ms ${idx * 80}ms ease-out forwards` : 'none'
           }}
         >
           <img 
@@ -114,9 +109,7 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
   return (
     <div className="flex justify-center mb-6">
       <div 
-        className={`relative w-[256px] h-[256px] mt-8 transition-all duration-300 overflow-hidden ${
-          animated ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-90'
-        }`}
+        className="relative w-[256px] h-[256px] mt-8 transition-all duration-300 overflow-hidden"
         style={{ 
           filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.06))',
           zIndex: 1,
