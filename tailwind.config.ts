@@ -101,6 +101,22 @@ export default {
 					'100%': { 
 						transform: 'scale(1)'
 					}
+				},
+				'snowfall': {
+					'0%': { 
+						transform: 'translateY(0) translateX(0)',
+						opacity: '0'
+					},
+					'10%': { 
+						opacity: '1'
+					},
+					'90%': { 
+						opacity: '1'
+					},
+					'100%': { 
+						transform: 'translateY(300px) translateX(50px)',
+						opacity: '0'
+					}
 				}
 			},
 			animation: {
@@ -109,7 +125,8 @@ export default {
 				'fade-in': 'fade-in 0.5s ease-in-out forwards',
 				'slide-in-bottom': 'slide-in-from-bottom 0.4s ease-out',
 				'scale-in-center': 'scale-in-center 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-				'count-up': 'count-up 1s ease-out'
+				'count-up': 'count-up 1s ease-out',
+				'snowfall': 'snowfall 8s linear infinite'
 			},
 			fontFamily: {
 				sans: ["var(--font-sans)", "system-ui", "sans-serif"],

@@ -8,6 +8,7 @@ import PricingPage from "./pages/PricingPage";
 import NotFound from "./pages/NotFound";
 import EcoPass from "./pages/EcoPass";
 import BottomNav from "./components/BottomNav";
+import MyForest from "./pages/MyForest";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/eco-pass" element={<EcoPass />} />
+        <Route path="/my-forest" element={<MyForest />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
