@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface StatsCardProps {
   streak: number;
@@ -20,35 +21,39 @@ const StatsCard: React.FC<StatsCardProps> = ({
 }) => {
   return (
     <div className="w-full px-4">
-      <div className="bg-white rounded-2xl p-5 shadow-md">
-        <div className="mb-3">
-          <span className="text-sm font-semibold text-[#1C2539]">Streak</span>
-          <div className="text-lg font-bold text-[#20B47B]">{streak}</div>
-        </div>
-        
-        <div className="mb-3">
-          <span className="text-sm font-semibold text-[#1C2539]">My trees planted</span>
-          <div className="text-lg font-bold text-[#20B47B]">{treesPlanted}</div>
-          <span className="text-xs italic text-[#6E7D9A]">Top {topPercentage}%</span>
-        </div>
-        
-        <div className="mb-3">
-          <span className="text-sm font-semibold text-[#1C2539]">My CO₂ impact</span>
-          <div className="text-lg font-bold text-[#20B47B]">
-            {co2Impact.toLocaleString()} kg
+      <Card className="bg-white rounded-2xl p-2 shadow-md border-none">
+        <CardContent className="pt-4">
+          <div className="space-y-6 text-center">
+            <div>
+              <span className="text-sm font-semibold text-[#1C2539]/80">Streak</span>
+              <div className="text-2xl font-bold text-ecobrain-green">{streak}</div>
+            </div>
+            
+            <div>
+              <span className="text-sm font-semibold text-[#1C2539]/80">My trees planted</span>
+              <div className="text-2xl font-bold text-ecobrain-green">{treesPlanted}</div>
+              <span className="text-xs italic text-[#6E7D9A]">Top {topPercentage}%</span>
+            </div>
+            
+            <div>
+              <span className="text-sm font-semibold text-[#1C2539]/80">My CO<sub>2</sub> impact</span>
+              <div className="text-2xl font-bold text-ecobrain-green">
+                {co2Impact.toLocaleString()} kg
+              </div>
+            </div>
+            
+            <div>
+              <span className="text-sm font-semibold text-[#1C2539]/80">IQ increase</span>
+              <div className="text-2xl font-bold text-ecobrain-green">+{iqIncrease}</div>
+            </div>
+            
+            <div className="pb-2">
+              <span className="text-sm font-semibold text-[#1C2539]/80">Next tier:</span>
+              <div className="text-2xl font-bold text-ecobrain-green">{nextTierReward}</div>
+            </div>
           </div>
-        </div>
-        
-        <div className="mb-3">
-          <span className="text-sm font-semibold text-[#1C2539]">IQ increase</span>
-          <div className="text-lg font-bold text-[#20B47B]">+{iqIncrease}</div>
-        </div>
-        
-        <div>
-          <span className="text-sm font-semibold text-[#1C2539]">Next tier:</span>
-          <div className="text-lg font-bold text-[#20B47B]">{nextTierReward}</div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
