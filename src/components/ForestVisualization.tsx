@@ -30,15 +30,22 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
     return () => clearTimeout(timer);
   }, [period, treeCount, isWinter]);
 
-  // 5×5 isometric grid inside the 256-px cube
-  // Coordinates guarantee every sprite's base sits inside the visible top surface
-  const GRID: TreePosition[] = [
-    {x: 26, y: 48}, {x: 78, y: 32}, {x: 130, y: 48}, {x: 182, y: 32}, {x: 234, y: 48},
-    {x: 50, y: 96}, {x: 102, y: 80}, {x: 154, y: 96}, {x: 206, y: 80},
-    {x: 26, y: 144}, {x: 78, y: 128}, {x: 130, y: 144}, {x: 182, y: 128}, {x: 234, y: 144},
-    {x: 50, y: 192}, {x: 102, y: 176}, {x: 154, y: 192}, {x: 206, y: 176},
-    {x: 78, y: 224}, {x: 130, y: 240}, {x: 182, y: 224}
-  ];  // 21 safe spots
+  // Anchor point grid - these mark where each trunk touches the surface
+  // Y-values measured to ensure trees never float
+  const ANCHORS: TreePosition[] = [
+    // Row 1 (back edge)
+    {x: 38, y: 96}, {x: 92, y: 82}, {x: 146, y: 96}, {x: 200, y: 82},
+    // Row 2
+    {x: 64, y: 126}, {x: 118, y: 112}, {x: 172, y: 126},
+    // Row 3
+    {x: 38, y: 156}, {x: 92, y: 142}, {x: 146, y: 156}, {x: 200, y: 142},
+    // Row 4 (front edge)
+    {x: 64, y: 186}, {x: 118, y: 172}, {x: 172, y: 186}
+  ]; // 15 safe cells
+
+  // Offsets for properly positioning tree sprites
+  const HALF_W = 24; // Half sprite width (48/2)
+  const FULL_H = 72; // Full sprite height
 
   // Base island image based on season
   const getBaseIslandImage = () => {
@@ -73,24 +80,23 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
       );
     } else {
       // Calculate how many trees to show (limit to available positions)
-      const treesToShow = Math.min(treeCount, GRID.length);
+      const treesToShow = Math.min(treeCount, ANCHORS.length);
       
-      // Optional shuffle for variety
-      const shuffledPositions = [...GRID]
-        .sort(() => 0.5 - Math.random())
-        .slice(0, treesToShow);
+      // Get positions for trees to show - deterministic order
+      const positions = ANCHORS.slice(0, treesToShow);
       
-      return shuffledPositions.map((pos, idx) => (
+      // Optional: Shuffle for variety
+      // const positions = [...ANCHORS].sort(() => 0.5 - Math.random()).slice(0, treesToShow);
+      
+      return positions.map((pos, idx) => (
         <div 
           key={idx}
-          className="absolute transition-all"
+          className="absolute"
           style={{
-            top: `${pos.y}px`,
-            left: `${pos.x}px`,
+            left: `${pos.x - HALF_W}px`,
+            top: `${pos.y - FULL_H}px`,
             width: '48px',
             height: '72px',
-            marginLeft: '-24px',   // center sprite on x
-            marginTop: '-72px',    // base aligned to cell
             zIndex: 2,
             animation: animated ? `grow 320ms ${idx * 80}ms ease-out forwards` : 'none'
           }}
@@ -108,12 +114,13 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
   return (
     <div className="flex justify-center mb-6">
       <div 
-        className={`relative w-[256px] h-[256px] mt-8 transition-all duration-300 overflow-hidden rounded-lg ${
+        className={`relative w-[256px] h-[256px] mt-8 transition-all duration-300 overflow-hidden ${
           animated ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-90'
         }`}
         style={{ 
           filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.06))',
-          zIndex: 1
+          zIndex: 1,
+          position: 'relative'
         }}
         aria-label={`Island showing ${treeCount} trees planted in ${period}`}
       >
