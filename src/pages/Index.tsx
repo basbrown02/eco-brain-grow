@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import AppBar from '@/components/AppBar';
 import AdRail from '@/components/AdRail';
@@ -225,7 +224,7 @@ const Index = () => {
   if (showCongratulations) {
     return (
       <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col overflow-y-auto">
           <AppBar />
           <div className="flex-grow flex items-center justify-center pb-20">
             <CongratulationsScreen 
@@ -246,9 +245,9 @@ const Index = () => {
   if (showCompletionScreen) {
     return (
       <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col overflow-y-auto">
           <AppBar />
-          <div className="flex-grow flex items-center justify-center pb-[90px]">
+          <div className="flex-grow flex items-center justify-center">
             <CompletionScreen 
               treesEarned={treesEarned}
               puzzleType={puzzleStage}
@@ -265,9 +264,9 @@ const Index = () => {
   if (showAnswerScreen) {
     return (
       <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col overflow-y-auto">
           <AppBar />
-          <div className="flex-grow flex items-center justify-center pb-20">
+          <div className="flex-grow flex items-center justify-center">
             <AnswerRevealScreen
               answer={currentPuzzle.answer}
               puzzleContent={currentPuzzle.content}
@@ -282,7 +281,7 @@ const Index = () => {
 
   return (
     <TooltipProvider>
-      <div className={`min-h-screen flex flex-col relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`min-h-screen flex flex-col overflow-y-auto relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
         <AppBar />
         
         {showPuzzleContent && (
