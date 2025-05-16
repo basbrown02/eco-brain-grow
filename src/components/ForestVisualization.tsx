@@ -30,17 +30,15 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
     return () => clearTimeout(timer);
   }, [period, treeCount, isWinter]);
 
-  // Tree planting positions - properly positioned on the island platform
-  const TREE_POSITIONS: TreePosition[] = [
-    // Top row (on the snow surface)
-    {x: 68, y: 52}, {x: 116, y: 52}, {x: 164, y: 52},
-    // Middle row
-    {x: 44, y: 98}, {x: 92, y: 98}, {x: 140, y: 98}, {x: 188, y: 98},
-    // Lower row
-    {x: 68, y: 144}, {x: 116, y: 144}, {x: 164, y: 144},
-    // Bottom row
-    {x: 92, y: 190}, {x: 140, y: 190}, {x: 116, y: 230}
-  ];
+  // 5×5 isometric grid inside the 256-px cube
+  // Coordinates guarantee every sprite's base sits inside the visible top surface
+  const GRID: TreePosition[] = [
+    {x: 26, y: 48}, {x: 78, y: 32}, {x: 130, y: 48}, {x: 182, y: 32}, {x: 234, y: 48},
+    {x: 50, y: 96}, {x: 102, y: 80}, {x: 154, y: 96}, {x: 206, y: 80},
+    {x: 26, y: 144}, {x: 78, y: 128}, {x: 130, y: 144}, {x: 182, y: 128}, {x: 234, y: 144},
+    {x: 50, y: 192}, {x: 102, y: 176}, {x: 154, y: 192}, {x: 206, y: 176},
+    {x: 78, y: 224}, {x: 130, y: 240}, {x: 182, y: 224}
+  ];  // 21 safe spots
 
   // Base island image based on season
   const getBaseIslandImage = () => {
@@ -75,12 +73,14 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
       );
     } else {
       // Calculate how many trees to show (limit to available positions)
-      const treesToShow = Math.min(treeCount, TREE_POSITIONS.length);
+      const treesToShow = Math.min(treeCount, GRID.length);
       
-      // Get positions for trees to show
-      const positions = TREE_POSITIONS.slice(0, treesToShow);
+      // Optional shuffle for variety
+      const shuffledPositions = [...GRID]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, treesToShow);
       
-      return positions.map((pos, idx) => (
+      return shuffledPositions.map((pos, idx) => (
         <div 
           key={idx}
           className="absolute transition-all"
@@ -89,8 +89,10 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
             left: `${pos.x}px`,
             width: '48px',
             height: '72px',
+            marginLeft: '-24px',   // center sprite on x
+            marginTop: '-72px',    // base aligned to cell
             zIndex: 2,
-            animation: animated ? `grow 300ms ${idx * 80}ms forwards` : 'none'
+            animation: animated ? `grow 320ms ${idx * 80}ms ease-out forwards` : 'none'
           }}
         >
           <img 
@@ -106,11 +108,12 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
   return (
     <div className="flex justify-center mb-6">
       <div 
-        className={`relative w-[256px] h-[256px] mt-6 transition-all duration-300 ${
+        className={`relative w-[256px] h-[256px] mt-8 transition-all duration-300 overflow-hidden rounded-lg ${
           animated ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-90'
         }`}
         style={{ 
-          filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.06))'
+          filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.06))',
+          zIndex: 1
         }}
         aria-label={`Island showing ${treeCount} trees planted in ${period}`}
       >
@@ -118,7 +121,7 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
         <img 
           src={getBaseIslandImage()} 
           alt="Forest island base"
-          className="absolute top-0 left-0 w-full h-full object-contain z-[1]"
+          className="absolute top-0 left-0 w-full h-full object-contain"
         />
         
         {/* Tree layer */}
