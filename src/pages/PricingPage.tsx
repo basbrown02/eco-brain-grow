@@ -1,6 +1,6 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppBar from '@/components/AppBar';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -45,21 +45,10 @@ const PricingPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col bg-white ${isTransitioning ? 'opacity-50 transition-opacity duration-500' : 'opacity-100 animate-fade-in'}`}>
-      {/* We're removing AppBar which contains a logo */}
       
-      <div className="flex-grow px-4 py-6 flex flex-col items-center relative">
-        {/* Optional faint leaf vein pattern */}
-        <div 
-          className="absolute inset-0 w-full h-64 bg-top bg-no-repeat opacity-5 pointer-events-none"
-          style={{ 
-            backgroundImage: "url('/lovable-uploads/8141c7bb-6aa8-4eff-91f9-924ff6900a39.png')",
-            backgroundSize: 'contain',
-            zIndex: 0 
-          }}
-        />
-        
+      <div className="flex-grow px-4 py-6 flex flex-col items-center">
         {/* Single pricing header with proper spacing */}
-        <div id="pricing-header" className="flex flex-col items-center mt-6 mb-10 z-10">
+        <div id="pricing-header" className="flex flex-col items-center mt-10 mb-10 z-10">
           <BrainIcon className="h-14 w-14 mb-4" />
           <h1 className="text-[28px] font-bold text-[#1C2539] text-center">
             Subscription Plans
