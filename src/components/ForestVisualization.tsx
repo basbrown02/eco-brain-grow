@@ -30,13 +30,16 @@ const ForestVisualization: React.FC<ForestVisualizationProps> = ({
     return () => clearTimeout(timer);
   }, [period, treeCount, isWinter]);
 
-  // Tree planting positions (adjusted to ensure trees are on the island platform)
-  // These coordinates are carefully positioned to place trees only on the visible island surface
+  // Tree planting positions - properly positioned on the island platform
   const TREE_POSITIONS: TreePosition[] = [
-    {x: 68, y: 80}, {x: 116, y: 80}, {x: 164, y: 80},  // Top row
-    {x: 44, y: 120}, {x: 92, y: 120}, {x: 140, y: 120}, {x: 188, y: 120}, // Middle row
-    {x: 68, y: 160}, {x: 116, y: 160}, {x: 164, y: 160}, // Bottom row
-    {x: 92, y: 200}, {x: 140, y: 200}, {x: 116, y: 240} // Bottom corners and center
+    // Top row (on the snow surface)
+    {x: 68, y: 52}, {x: 116, y: 52}, {x: 164, y: 52},
+    // Middle row
+    {x: 44, y: 98}, {x: 92, y: 98}, {x: 140, y: 98}, {x: 188, y: 98},
+    // Lower row
+    {x: 68, y: 144}, {x: 116, y: 144}, {x: 164, y: 144},
+    // Bottom row
+    {x: 92, y: 190}, {x: 140, y: 190}, {x: 116, y: 230}
   ];
 
   // Base island image based on season
