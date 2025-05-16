@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import AppBar from '@/components/AppBar';
-import AdRail from '@/components/AdRail';
+
+import React from 'react';
 import Confetti from '@/components/Confetti';
 import EntryScreen from '@/components/EntryScreen';
 import AnswerRevealScreen from '@/components/AnswerRevealScreen';
@@ -9,91 +8,45 @@ import CongratulationsScreen from '@/components/CongratulationsScreen';
 import SeedPlantedScreen from '@/components/SeedPlantedScreen';
 import CompletionScreen from '@/components/CompletionScreen';
 import PuzzleContent from '@/components/PuzzleContent';
-import AppBarContent from '@/components/AppBarContent';
+import MainGameLayout from '@/components/screens/MainGameLayout';
+import { usePuzzleState } from '@/hooks/usePuzzleState';
+import { useUserStats } from '@/hooks/useUserStats';
+import { useAppStats } from '@/hooks/useAppStats';
+import { useScreenNavigation } from '@/hooks/useScreenNavigation';
+import { calculateTreesEarned, calculateIQAdjustment, showCorrectAnswerFeedback, 
+         showIncorrectAnswerFeedback, showHintUsedFeedback, handleShareAction } from '@/utils/puzzleHandlers';
 import { useToast } from '@/hooks/use-toast';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { getTodaysDailyPuzzle, getCustomPuzzleForUser } from '@/utils/puzzleUtils';
-import { hasValidApiKey } from '@/utils/geminiApi';
 
 const Index = () => {
   const { toast } = useToast();
-  const [showEntry, setShowEntry] = useState(true);
-  const [showPuzzleContent, setShowPuzzleContent] = useState(false);
-  const [isTextAnimating, setIsTextAnimating] = useState(false);
-  const [availableHints, setAvailableHints] = useState(3);
-  const [currentHint, setCurrentHint] = useState<string | undefined>(undefined);
-  const [treesToday, setTreesToday] = useState(12453);
-  const [treesTotal, setTreesTotal] = useState(5287401);
-  const [activeUsers, setActiveUsers] = useState(32859);
-  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
-  const [showConfetti, setShowConfetti] = useState(false);
   
-  // Current puzzle state
-  const [currentPuzzle, setCurrentPuzzle] = useState<any>(null);
-  const [isLoadingPuzzle, setIsLoadingPuzzle] = useState(false);
+  // State hooks
+  const {
+    currentPuzzle, isLoadingPuzzle, isAnswerCorrect, setIsAnswerCorrect,
+    showPuzzleContent, setShowPuzzleContent, isTextAnimating, setIsTextAnimating,
+    availableHints, setAvailableHints, currentHint, setCurrentHint, 
+    isDisabled, setIsDisabled, puzzleStage, setPuzzleStage, resetPuzzleState
+  } = usePuzzleState();
   
-  // Tree planting animation states
-  const [plantingStage, setPlantingStage] = useState<'seed' | 'watering' | 'growing' | null>(null);
-  const [showCongratulations, setShowCongratulations] = useState(false);
-  const [showSeedPlanted, setShowSeedPlanted] = useState(false);
+  const {
+    userIQ, setUserIQ, userTreesTotal, setUserTreesTotal, 
+    streakDays, setStreakDays, co2Reduced, setCo2Reduced, 
+    iqIncrease, setIqIncrease, treesEarned, setTreesEarned,
+    totalTreesEarned, setTotalTreesEarned
+  } = useUserStats();
   
-  // User stats 
-  const [userIQ, setUserIQ] = useState(100); // Starting IQ score
-  const [userTreesTotal, setUserTreesTotal] = useState(5);
-  const [streakDays, setStreakDays] = useState(3);
-  const [co2Reduced, setCo2Reduced] = useState(20); // kg
-  const [iqIncrease, setIqIncrease] = useState(3); // points
+  const {
+    treesToday, setTreesToday, treesTotal, setTreesTotal, activeUsers
+  } = useAppStats();
   
-  // Track user puzzle progress
-  const [puzzleStage, setPuzzleStage] = useState<'daily' | 'custom' | 'complete'>('daily');
-  const [showCompletionScreen, setShowCompletionScreen] = useState(false);
-  const [showAnswerScreen, setShowAnswerScreen] = useState(false);
-  const [treesEarned, setTreesEarned] = useState(0);
-  const [totalTreesEarned, setTotalTreesEarned] = useState(0);
-  const [isDisabled, setIsDisabled] = useState(false);
+  const {
+    showEntry, setShowEntry, showCongratulations, setShowCongratulations,
+    showSeedPlanted, setShowSeedPlanted, showCompletionScreen, setShowCompletionScreen,
+    showAnswerScreen, setShowAnswerScreen, showConfetti, setShowConfetti,
+    plantingStage, setPlantingStage
+  } = useScreenNavigation();
   
-  // Load today's daily puzzle when the app starts
-  useEffect(() => {
-    const loadInitialPuzzle = async () => {
-      if (!currentPuzzle && puzzleStage === 'daily') {
-        setCurrentPuzzle(await getTodaysDailyPuzzle());
-      }
-    };
-    
-    loadInitialPuzzle();
-    
-    // Check if API key exists and show toast if not
-    if (!hasValidApiKey()) {
-      setTimeout(() => {
-        toast({
-          title: "Gemini API Key Missing",
-          description: "Set your Gemini API key in the top bar to get unique puzzles.",
-          duration: 6000,
-        });
-      }, 2000);
-    }
-  }, []);
-  
-  // Load the appropriate puzzle when puzzle stage changes
-  useEffect(() => {
-    const loadPuzzle = async () => {
-      setIsLoadingPuzzle(true);
-      try {
-        if (puzzleStage === 'daily') {
-          setCurrentPuzzle(await getTodaysDailyPuzzle());
-        } else if (puzzleStage === 'custom') {
-          setCurrentPuzzle(await getCustomPuzzleForUser(userIQ));
-        }
-      } catch (error) {
-        console.error("Error loading puzzle:", error);
-      } finally {
-        setIsLoadingPuzzle(false);
-      }
-    };
-    
-    loadPuzzle();
-  }, [puzzleStage, userIQ]);
-  
+  // Handler functions
   const handleStartPuzzle = () => {
     setShowEntry(false);
     
@@ -101,9 +54,7 @@ const Index = () => {
     setTimeout(() => {
       setShowPuzzleContent(true);
       setPuzzleStage('daily');
-      setAvailableHints(3);
-      setCurrentHint(undefined);
-      setIsAnswerCorrect(null);
+      resetPuzzleState();
       
       // Start typewriter animation
       setTimeout(() => {
@@ -121,11 +72,7 @@ const Index = () => {
       setAvailableHints(prev => prev - 1);
       
       // Lower tree multiplier
-      toast({
-        title: "Hint Used",
-        description: "Your tree multiplier has decreased by 10%.",
-        variant: "default"
-      });
+      showHintUsedFeedback();
     }
   };
 
@@ -149,9 +96,7 @@ const Index = () => {
       
       // After a brief pause, show the next puzzle
       setTimeout(() => {
-        setAvailableHints(3);
-        setCurrentHint(undefined);
-        setIsAnswerCorrect(null);
+        resetPuzzleState();
         setShowPuzzleContent(true);
         
         // Start typewriter animation
@@ -188,11 +133,7 @@ const Index = () => {
   
   const handleShare = () => {
     // In a real app, this would open native share dialog or copy to clipboard
-    toast({
-      title: "Sharing Impact",
-      description: "I've planted a tree with EcoBrain! Join me in helping the planet while boosting your brain.",
-      variant: "default"
-    });
+    handleShareAction();
   };
   
   const transitionToNextStage = (treeIncrement: number) => {
@@ -227,9 +168,7 @@ const Index = () => {
     
     // After a brief pause, show the next puzzle
     setTimeout(() => {
-      setAvailableHints(3);
-      setCurrentHint(undefined);
-      setIsAnswerCorrect(null);
+      resetPuzzleState();
       setShowPuzzleContent(true);
       
       // Start typewriter animation
@@ -258,23 +197,16 @@ const Index = () => {
     setIsDisabled(true);
     
     if (correct) {
-      // Calculate trees earned based on:
-      // 1. Base amount (5 trees)
-      // 2. If it's a custom puzzle, bonus based on difficulty level
-      // 3. Remaining hints (each unused hint = +1 tree)
-      let treeIncrement = 5; // Base amount
+      // Calculate trees earned
+      const treeIncrement = calculateTreesEarned(
+        puzzleStage, 
+        availableHints,
+        currentPuzzle.difficultyLevel
+      );
       
-      // Add bonus for custom puzzle difficulty
-      if (puzzleStage === 'custom' && currentPuzzle.difficultyLevel) {
-        treeIncrement += currentPuzzle.difficultyLevel * 2;
-      }
-      
-      // Add bonus for unused hints
-      treeIncrement += availableHints;
-      
-      // Adjust IQ based on performance (faster answer, fewer hints = higher IQ boost)
+      // Adjust IQ based on performance
       if (puzzleStage === 'custom') {
-        const iqBoost = Math.floor((availableHints + 1) * 2); // +2 to +6 IQ points
+        const iqBoost = calculateIQAdjustment(puzzleStage, true, availableHints);
         setUserIQ(prev => prev + iqBoost);
         setIqIncrease(iqBoost);
       }
@@ -283,11 +215,7 @@ const Index = () => {
       setTimeout(() => {
         setShowConfetti(true);
         
-        toast({
-          title: "Correct Answer!",
-          description: `Great job! Time to plant a tree!`,
-          variant: "default"
-        });
+        showCorrectAnswerFeedback();
         
         // After celebration
         setTimeout(() => {
@@ -306,11 +234,7 @@ const Index = () => {
         setIsAnswerCorrect(null);
       }, 2000);
       
-      toast({
-        title: "Not quite right",
-        description: "Try again or use a hint!",
-        variant: "destructive"
-      });
+      showIncorrectAnswerFeedback();
       
       // Small IQ reduction for wrong answers on custom puzzles
       if (puzzleStage === 'custom') {
@@ -322,126 +246,90 @@ const Index = () => {
   // Render appropriate screen based on app state
   if (showEntry) {
     return (
-      <TooltipProvider>
-        <EntryScreen onStartPuzzle={handleStartPuzzle} />
-      </TooltipProvider>
+      <EntryScreen onStartPuzzle={handleStartPuzzle} />
     );
   }
 
   if (showCongratulations) {
     return (
-      <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
-          <AppBar>
-            <AppBarContent />
-          </AppBar>
-          <div className="flex-grow flex items-center justify-center pb-20">
-            <CongratulationsScreen 
-              treesEarned={userTreesTotal}
-              streakDays={streakDays}
-              co2Reduced={co2Reduced}
-              iqIncrease={iqIncrease}
-              onContinue={handleContinueFromCongratulations}
-              onShare={handleShare}
-            />
-          </div>
-          <AdRail />
-        </div>
-      </TooltipProvider>
+      <MainGameLayout>
+        <CongratulationsScreen 
+          treesEarned={userTreesTotal}
+          streakDays={streakDays}
+          co2Reduced={co2Reduced}
+          iqIncrease={iqIncrease}
+          onContinue={handleContinueFromCongratulations}
+          onShare={handleShare}
+        />
+      </MainGameLayout>
     );
   }
   
   if (showSeedPlanted) {
     return (
-      <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
-          <AppBar>
-            <AppBarContent />
-          </AppBar>
-          <div className="flex-grow flex items-center justify-center pb-20">
-            <SeedPlantedScreen onContinue={handleContinueFromSeedPlanted} />
-          </div>
-          <AdRail />
-        </div>
-      </TooltipProvider>
+      <MainGameLayout>
+        <SeedPlantedScreen onContinue={handleContinueFromSeedPlanted} />
+      </MainGameLayout>
     );
   }
   
   if (showCompletionScreen) {
     return (
-      <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
-          <AppBar>
-            <AppBarContent />
-          </AppBar>
-          <div className="flex-grow flex items-center justify-center pb-[90px]">
-            <CompletionScreen 
-              treesEarned={treesEarned}
-              puzzleType={puzzleStage}
-              onContinue={handleContinueFromSeedPlanted}
-              isComplete={puzzleStage === 'custom'}
-            />
-          </div>
-          <AdRail />
-        </div>
-      </TooltipProvider>
+      <MainGameLayout>
+        <CompletionScreen 
+          treesEarned={treesEarned}
+          puzzleType={puzzleStage}
+          onContinue={handleContinueFromSeedPlanted}
+          isComplete={puzzleStage === 'custom'}
+        />
+      </MainGameLayout>
     );
   }
 
   if (showAnswerScreen && currentPuzzle) {
     return (
-      <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
-          <AppBar>
-            <AppBarContent />
-          </AppBar>
-          <div className="flex-grow flex items-center justify-center pb-20">
-            <AnswerRevealScreen
-              answer={currentPuzzle.answer}
-              puzzleContent={currentPuzzle.content}
-              onContinue={handleContinueFromAnswer}
-            />
-          </div>
-          <AdRail />
-        </div>
-      </TooltipProvider>
+      <MainGameLayout>
+        <AnswerRevealScreen
+          answer={currentPuzzle.answer}
+          puzzleContent={currentPuzzle.content}
+          onContinue={handleContinueFromAnswer}
+        />
+      </MainGameLayout>
     );
   }
 
   return (
-    <TooltipProvider>
-      <div className={`min-h-screen flex flex-col relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
-        <AppBar>
-          <AppBarContent />
-        </AppBar>
-        
-        {showPuzzleContent && currentPuzzle && (
-          <PuzzleContent
-            puzzleContent={currentPuzzle.content}
-            isTextAnimating={isTextAnimating}
-            puzzleStage={puzzleStage}
-            availableHints={availableHints}
-            currentHint={currentHint}
-            handleUseHint={handleUseHint}
-            handleShowAnswer={handleShowAnswer}
-            handleSubmitAnswer={handleSubmitAnswer}
-            isAnswerCorrect={isAnswerCorrect}
-            isDisabled={isDisabled || isLoadingPuzzle}
-            treesToday={treesToday}
-            treesTotal={treesTotal}
-            activeUsers={activeUsers}
-            userIQ={userIQ}
-          />
-        )}
-        
-        <AdRail />
-        <Confetti active={showConfetti} />
-        <TreePlantingAnimation 
-          stage={plantingStage} 
-          onComplete={handlePlantingAnimationComplete} 
+    <div className={`min-h-screen flex flex-col relative animate-fade-in ${showPuzzleContent ? 'opacity-100' : 'opacity-0'}`}>
+      <AppBar>
+        <AppBarContent />
+      </AppBar>
+      
+      {showPuzzleContent && currentPuzzle && (
+        <PuzzleContent
+          puzzleContent={currentPuzzle.content}
+          isTextAnimating={isTextAnimating}
+          puzzleStage={puzzleStage}
+          availableHints={availableHints}
+          currentHint={currentHint}
+          handleUseHint={handleUseHint}
+          handleShowAnswer={handleShowAnswer}
+          handleSubmitAnswer={handleSubmitAnswer}
+          isAnswerCorrect={isAnswerCorrect}
+          isDisabled={isDisabled || isLoadingPuzzle}
+          treesToday={treesToday}
+          treesTotal={treesTotal}
+          activeUsers={activeUsers}
+          userIQ={userIQ}
         />
-      </div>
-    </TooltipProvider>
+      )}
+      
+      <AdRail />
+      <Confetti active={showConfetti} />
+      <TreePlantingAnimation 
+        stage={plantingStage} 
+        onComplete={handlePlantingAnimationComplete} 
+      />
+    </div>
   );
 };
 
